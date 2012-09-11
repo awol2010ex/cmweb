@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cmweb.oa">
+<!--  取得人员明细 -->
+	<select id="getStaffList" parameterType="map" resultType="map">
+	    SELECT
+    s.staffname AS name,
+    s.email,
+    s.tel ,
+    ui.area ,
+    ui.PROVINCE,
+    ui.CITY,
+    ui.SIMPLE_NAME ORG_NAME 
+FROM
+    wf_staff s,
+    ip_arc_user_auth u ,
+    t_biz_unitinfo ui
+WHERE
+    s.staffid=u.staff_id
+AND s.ownerunitid =ui.id
+	    and u.login_id= #{login_id}</select>
+</mapper>

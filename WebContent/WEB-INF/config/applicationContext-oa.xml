@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="gb2312"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:jee="http://www.springframework.org/schema/jee" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd  http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd  http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd  http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-2.0.xsd">
+  
+   <!-- OA数据库连接 -->
+  <jee:jndi-lookup id="dataSourceOA" jndi-name="java:/comp/env/OADB" />
+  <!-- OA数据库ibatis -->
+  <bean id="oaSqlSessionFactory" 
+                class="org.mybatis.spring.SqlSessionFactoryBean">
+                
+                <property name="dataSource" ref="dataSourceOA" />
+                
+                <property name="mapperLocations">
+                        <value>/WEB-INF/config/myibatis/sqlmap/oa/*.xml</value>
+                </property>
+   </bean>
+   
+   
+   <!-- OA数据库ibatis -->
+   <bean id="oaSqlSession" class="org.mybatis.spring.SqlSessionTemplate"> 
+
+      <constructor-arg index="0" ref="oaSqlSessionFactory" /> 
+
+   </bean> 
+   
+   <!-- OA人员信息操作 -->
+   <bean id="staffService" class="com.cmweb.oa.service.impl.StaffServiceImpl"> 
+        <property name="oaSqlSession" ref="oaSqlSession" />
+   </bean> 
+   
+   
+</beans>
+
