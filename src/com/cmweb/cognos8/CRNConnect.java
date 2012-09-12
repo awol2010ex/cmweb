@@ -78,10 +78,6 @@ public class CRNConnect
 	private SystemService_Port sysService = null;
 	private Dispatcher_Port dispatchService=null;
 	
-	// Set the location of the sample reports.
-	private String curDir = System.getProperty("user.dir");
-    private String CRN_HOME = curDir.substring(0,curDir.lastIndexOf("sdk")-1);
-	private String REPORT_PATH = CRN_HOME + "/webcontent/samples";
 
 	// Create a variable that contains the default URL for Content Manager.            
 	// sn_dg_prm_smpl_connect_start_2
@@ -273,16 +269,6 @@ public class CRNConnect
 		}
 	}
 
-	public String getDefaultSavePath()
-	{
-		return REPORT_PATH;
-	}
-
-	public void setDefaultSavePath(String newReportPath)
-	{
-		REPORT_PATH = newReportPath;
-	}
-	
 	public AgentService_Port getAgentService()
 	{
 		BiBusHeader bibus = null;
