@@ -25,17 +25,17 @@ import com.cmweb.cognos8.service.ICognos8Service;
 public class UserController {
 	private final static Logger logger = LoggerFactory
 			.getLogger(UserController.class);
-	
-	
+
 	@Autowired
 	private ICognos8Service cognos8Service;// cognos8 操作
-	
+
 	@Autowired
-	private  CRNConnectFactory crnConnectFactory ;//生成连接
-	
+	private CRNConnectFactory crnConnectFactory;// 生成连接
+
 	/* 登录 */
 	@RequestMapping(value = "/login")
-	public String login(String j_username, String j_password,HttpServletRequest request) {
+	public String login(String j_username, String j_password,
+			HttpServletRequest request) {
 
 		UsernamePasswordToken token = new UsernamePasswordToken(j_username,
 				j_password);
@@ -65,20 +65,26 @@ public class UserController {
 			logger.error("", e);
 			return "index";
 		}
-		
-		
-		
-		
-		try {//cognos8登陆
-			CRNConnect  connection =crnConnectFactory.createConnect();
-			cognos8Service.quickLogon(connection, "SSOAuth", j_username, j_password);
+
+		String cognos8_str = null;
+
+		try {// cognos8登陆
+			CRNConnect connection = crnConnectFactory.createConnect();
+			cognos8Service.quickLogon(connection, "SSOAuth", j_username,
+					j_password);
+			cognos8_str = "cognos 8 登陆成功";
+			currentUser.getSession().setAttribute("connection", connection);//存入连接到会话
+			
+			currentUser.getSession().setAttribute("j_username", j_username);//存入用户名到会话
+			currentUser.getSession().setAttribute("j_password", j_password);//存入密码到会话
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			logger.error("",e);
+			logger.error("", e);
+			cognos8_str = "cognos 8 登陆失败";
 		}
-		
-		
-		
+		if (cognos8_str != null) {
+			request.setAttribute("cognos8_str", cognos8_str);
+		}
 		return "main";
 	}
 }
