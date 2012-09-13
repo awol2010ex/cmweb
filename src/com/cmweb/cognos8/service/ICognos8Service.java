@@ -1,6 +1,7 @@
 package com.cmweb.cognos8.service;
 
 import com.cmweb.cognos8.CRNConnect;
+import com.cognos.developer.schemas.bibus._3.BaseClass;
 
 //cognos 8 逻辑层操作
 public interface ICognos8Service {
@@ -12,4 +13,7 @@ public interface ICognos8Service {
 				String uid,
 				String pwd)
 				throws Exception;
+	
+	//取得子节点
+	public BaseClass[]  getChildren(CRNConnect connection,String searchPath ) throws Exception;
 }
