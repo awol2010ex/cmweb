@@ -48,7 +48,7 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 	//取得报表列表
 	public BaseClass[]  getChildren(CRNConnect connection,String searchPath ) throws Exception{
 		PropEnum props[] =
-			new PropEnum[] { PropEnum.searchPath, PropEnum.defaultName };
+			new PropEnum[] { PropEnum.searchPath, PropEnum.defaultName ,PropEnum.ancestors};
 		Sort sortOptions[] = { new Sort()};
 		sortOptions[0].setOrder(OrderEnum.ascending);
 		sortOptions[0].setPropName(PropEnum.defaultName);

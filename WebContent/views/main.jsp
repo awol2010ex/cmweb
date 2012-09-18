@@ -10,17 +10,26 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title></title>
+<jsp:include  page="/css.jsp"  flush="true" />
+
 <script type='text/javascript'>
-//初始页面
-function init(){
-	
-	<%if(cognos8_str!=null&&!"".equals(cognos8_str)){%>
-	   alert("<%=cognos8_str%>");
-	<%}%>
-}
+$(function (){
+            $("#layout1").ligerLayout({
+                minLeftWidth:80,
+                minRightWidth:80
+            });
+});
+
 </script>
 </head>
-<body  onload="init()">
+<body>
+
+ <div id="layout1">
+             <div  position="left"></div>
+            <div position="center" title="报表列表">
+            </div>
+            <div position="top"><%=cognos8_str%></div>
+        </div> 
 
 </body>
 </html>
