@@ -1,5 +1,7 @@
 package com.cmweb.cognos8.service.impl;
 
+import java.math.BigInteger;
+
 import org.springframework.stereotype.Service;
 
 import com.cmweb.cognos8.CRNConnect;
@@ -48,8 +50,8 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 	//取得报表列表
 	public BaseClass[]  getChildren(CRNConnect connection,String searchPath ) throws Exception{
 		PropEnum props[] =
-			new PropEnum[] { PropEnum.searchPath, PropEnum.defaultName,PropEnum.storeID};
-		Sort sortOptions[] = { new Sort()};
+			new PropEnum[] { PropEnum.searchPath, PropEnum.defaultName,PropEnum.storeID};//显示字段
+		Sort sortOptions[] = { new Sort()};//排序
 		sortOptions[0].setOrder(OrderEnum.ascending);
 		sortOptions[0].setPropName(PropEnum.defaultName);
 		
@@ -59,4 +61,5 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 				sortOptions,
 				new QueryOptions());
 	}
+	
 }

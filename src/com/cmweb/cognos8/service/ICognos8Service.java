@@ -16,4 +16,6 @@ public interface ICognos8Service {
 	
 	//取得子节点
 	public BaseClass[]  getChildren(CRNConnect connection,String searchPath ) throws Exception;
+	
+	
 }
