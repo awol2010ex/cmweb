@@ -1,4 +1,5 @@
 package com.cmweb.cognos8;
+
 /**
  * Email.java
  *
@@ -25,6 +26,9 @@ package com.cmweb.cognos8;
  *      other requests, improving performance.
  */
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.cognos.developer.schemas.bibus._3.AddressSMTP;
 import com.cognos.developer.schemas.bibus._3.AsynchReply;
 import com.cognos.developer.schemas.bibus._3.AsynchReplyStatusEnum;
@@ -50,97 +54,89 @@ import com.cognos.developer.schemas.bibus._3.SearchPathSingleObject;
 import com.cognos.developer.schemas.bibus._3.SmtpContentDispositionEnum;
 import com.cognos.developer.schemas.bibus._3.Sort;
 
-public class Email
-{
-
+public class Email {
+	private final static Logger logger = LoggerFactory.getLogger(Email.class);
 	private static final int REP_HTML = 0;
 	private static final int REP_XML = 1;
 	private static final int REP_PDF = 2;
 	private static final int REP_CSV = 3;
+	private static final int REP_XLS = 4;
+	private static final int REP_MHT = 5;
+	private static final int REP_XHTML = 6;
+	private static final int REP_XLWA = 7;
+	private static final int REP_singleXLS = 8;
+	private static final int REP_HTMLFragment = 9;
 
 	/**
 	 * @param connection
-	 * 		  Connection to IBM Cognos 8
+	 *            Connection to IBM Cognos 8
 	 * @param report
-	 *        Specifies the report.
+	 *            Specifies the report.
 	 * @param bodyText
-	 *        Specifies the text for the body of the email message.
+	 *            Specifies the text for the body of the email message.
 	 * @param emailSubject
-	 *        Specifies the subject of the email message.
+	 *            Specifies the subject of the email message.
 	 * @param emailFormat
-	 *        Specifies the format of the email message.
+	 *            Specifies the format of the email message.
 	 * @param emails
-	 *        An array of email addresses.
+	 *            An array of email addresses.
 	 * @param response
-	 *        Specifies the primary request. If no primary request is passed
-	 *        to this method, this method calls the IBM Cognos 8 SDK run method.
-	 *        A primary request is necessary to issue a secondary request, such
-	 *        as an email request, because a secondary request can only continue
-	 *        a conversation established by a primary request.
-	*/
-	public String emailReport(
-		CRNConnect connection,
-		BaseClassWrapper report,
-		String bodyText,
-		String emailSubject,
-		int emailFormat,
-		AddressSMTP[] emails,
-		AsynchRequest response)
-	{
+	 *            Specifies the primary request. If no primary request is passed
+	 *            to this method, this method calls the IBM Cognos 8 SDK run
+	 *            method. A primary request is necessary to issue a secondary
+	 *            request, such as an email request, because a secondary request
+	 *            can only continue a conversation established by a primary
+	 *            request.
+	 */
+	public String emailReport(CRNConnect connection, BaseClassWrapper report,
+			String bodyText, String emailSubject, int emailFormat,
+			AddressSMTP[] emails, AsynchRequest response) {
 		AsynchReply asynchReply = null;
-		String reportPath = report.getBaseClassObject().getSearchPath().getValue();
+		String reportPath = report.getBaseClassObject().getSearchPath()
+				.getValue();
 
 		/*
-		if (report == null)
-		{
-			return "No valid report selected";
-		}
-        */
-		try
-		{
+		 * if (report == null) { return "No valid report selected"; }
+		 */
+		try {
 			// Get the list of parameters used by the report, including
 			// optional parameters.
 			ParameterValue reportParameters[] = new ParameterValue[] {};
 			ReportParameters repParms = new ReportParameters();
-			BaseParameter[] prm = repParms.getReportParameters(report, connection);
+			BaseParameter[] prm = repParms.getReportParameters(report,
+					connection);
 
-			if (prm != null && prm.length > 0)
-			{
-				reportParameters =
-					ReportParameters.setReportParameters(prm);
+			if (prm != null && prm.length > 0) {
+				reportParameters = ReportParameters.setReportParameters(prm);
 			}
 
 			// Set the run options for the execute method.
 			Option[] execRunOptions = new Option[2];
 			Option[] emailRunOptions = new Option[6];
 
-			if (response == null)
-			{
-				//Execute the report, specify output format
-				//set the continueConversation option, to allow
-				//subsequent requests
+			if (response == null) {
+				// Execute the report, specify output format
+				// set the continueConversation option, to allow
+				// subsequent requests
 				execRunOptions[0] = setEmailFormat(emailFormat);
 				execRunOptions[1] = setNoPrompt();
 
-				asynchReply =
-					connection.getReportService().run(new SearchPathSingleObject(reportPath), reportParameters, execRunOptions);
+				asynchReply = connection.getReportService().run(
+						new SearchPathSingleObject(reportPath),
+						reportParameters, execRunOptions);
 
-				// If response is not immediately complete, call wait until complete
-				if (!asynchReply.getStatus().equals(AsynchReplyStatusEnum.complete))
-				{
-					while (!asynchReply.getStatus().equals(AsynchReplyStatusEnum.complete))
-					{
-						//before calling wait, double check that it is okay
-						if (hasSecondaryRequest(asynchReply, "wait"))
-						{
-							asynchReply =
-							connection.getReportService().wait(
-								asynchReply.getPrimaryRequest(),
-									new ParameterValue[] {},
-									new Option[] {});
-						}
-						else
-						{
+				// If response is not immediately complete, call wait until
+				// complete
+				if (!asynchReply.getStatus().equals(
+						AsynchReplyStatusEnum.complete)) {
+					while (!asynchReply.getStatus().equals(
+							AsynchReplyStatusEnum.complete)) {
+						// before calling wait, double check that it is okay
+						if (hasSecondaryRequest(asynchReply, "wait")) {
+							asynchReply = connection.getReportService().wait(
+									asynchReply.getPrimaryRequest(),
+									new ParameterValue[] {}, new Option[] {});
+						} else {
 							return "Error: Wait method not available as expected.";
 						}
 					}
@@ -149,75 +145,66 @@ public class Email
 				response = asynchReply.getPrimaryRequest();
 			}
 
-			if (response != null)
-			{
-				//Set the required fields for generating the email output
+			if (response != null) {
+				// Set the required fields for generating the email output
 				emailRunOptions[0] = setDeliveryMethodEmail();
 				emailRunOptions[1] = setEmailAttach();
 				emailRunOptions[2] = setEmailSubject(emailSubject);
 
 				// If no email addresses are specified, send the email
 				// message to all contacts.
-				if (emails != null && emails.length > 0)
-				{
+				if (emails != null && emails.length > 0) {
 					emailRunOptions[3] = setEmailAddresses(emails);
-				}
-				else
-				{
+				} else {
 					emailRunOptions[3] = getContactEmails(connection);
 				}
 				emailRunOptions[4] = setEmailBody(bodyText);
 				emailRunOptions[5] = setContinueConversation();
 
-				//call email
+				// call email
 				// sn_dg_sdk_method_reportService_deliver_start_1
-				asynchReply = connection.getReportService().deliver(response, new ParameterValue[] {}, emailRunOptions);
+				asynchReply = connection.getReportService().deliver(response,
+						new ParameterValue[] {}, emailRunOptions);
 				// sn_dg_sdk_method_reportService_deliver_end_1
 
-				// If response is not immediately complete, call wait until complete
-				if ((!asynchReply.getStatus().equals(AsynchReplyStatusEnum.complete)) && (!asynchReply.getStatus().equals(AsynchReplyStatusEnum.conversationComplete)))
-				{
-					while ((!asynchReply.getStatus().equals(AsynchReplyStatusEnum.complete))
-							&& (!asynchReply.getStatus().equals(AsynchReplyStatusEnum.conversationComplete)))
-					{
-						//before calling wait, double check that it is okay
-						if (hasSecondaryRequest(asynchReply, "wait"))
-						{
-							asynchReply =
-								connection.getReportService().wait(
+				// If response is not immediately complete, call wait until
+				// complete
+				if ((!asynchReply.getStatus().equals(
+						AsynchReplyStatusEnum.complete))
+						&& (!asynchReply.getStatus().equals(
+								AsynchReplyStatusEnum.conversationComplete))) {
+					while ((!asynchReply.getStatus().equals(
+							AsynchReplyStatusEnum.complete))
+							&& (!asynchReply.getStatus().equals(
+									AsynchReplyStatusEnum.conversationComplete))) {
+						// before calling wait, double check that it is okay
+						if (hasSecondaryRequest(asynchReply, "wait")) {
+							asynchReply = connection.getReportService().wait(
 									asynchReply.getPrimaryRequest(),
-									new ParameterValue[] {},
-									new Option[] {});
-						}
-						else
-						{
+									new ParameterValue[] {}, new Option[] {});
+						} else {
 							return "Error: Wait method not available as expected.";
 						}
 					}
 				}
-			}
-			else
-			{
-				System.out.println(
-					"Response null, unable to issue secondary request.");
+			} else {
+				logger.info("Response null, unable to issue secondary request.");
 			}
 
-			System.out.println("The email Java method completed successfully.");
+			logger.info("The email Java method completed successfully.");
 			return "Email method complete";
 
-		}
-		catch (Exception e)
-		{
-			System.out.println("An error occurred in the email Java method.");
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.info("An error occurred in the email Java method.");
+			logger.error("", e);
 			return "An error occurred in the email Java method.";
 		}
 
 	}
 
-	public DeliveryOptionAddressSMTPArray setEmailAddresses(AddressSMTP[] emails)
-	{
-		//The emails can also be taken from CM as group, user, etc.(see Email class)
+	public DeliveryOptionAddressSMTPArray setEmailAddresses(AddressSMTP[] emails) {
+		// The emails can also be taken from CM as group, user, etc.(see Email
+		// class)
 		DeliveryOptionAddressSMTPArray emailAddress = new DeliveryOptionAddressSMTPArray();
 
 		emailAddress.setName(DeliveryOptionEnum.toAddress);
@@ -226,8 +213,7 @@ public class Email
 		return emailAddress;
 	}
 
-	public DeliveryOptionMemoPart setEmailBody(String text)
-	{
+	public DeliveryOptionMemoPart setEmailBody(String text) {
 		DeliveryOptionMemoPart bodyText = new DeliveryOptionMemoPart();
 		MemoPartString memoText = new MemoPartString();
 
@@ -240,65 +226,70 @@ public class Email
 		return bodyText;
 	}
 
-	public DeliveryOptionString setEmailSubject(String myEmailSubject)
-	{
+	public DeliveryOptionString setEmailSubject(String myEmailSubject) {
 		DeliveryOptionString subjectText = new DeliveryOptionString();
 		subjectText.setName(DeliveryOptionEnum.subject);
 		subjectText.setValue(myEmailSubject);
 		return subjectText;
 	}
 
-	public RunOptionBoolean setEmailAttach()
-	{
+	public RunOptionBoolean setEmailAttach() {
 		RunOptionBoolean attach = new RunOptionBoolean();
 		attach.setName(RunOptionEnum.emailAsAttachment);
 		attach.setValue(true);
 		return attach;
 	}
 
-	public RunOptionStringArray setEmailFormat(int emailFormat)
-	{
+	public RunOptionStringArray setEmailFormat(int emailFormat) {
 		RunOptionStringArray rof = new RunOptionStringArray();
 		rof.setName(RunOptionEnum.outputFormat);
 		rof.setValue(this.getReportFormat(emailFormat));
 		return rof;
 	}
 
-	public RunOptionBoolean setNoPrompt()
-	{
-		//Set the report not to prompt
+	public RunOptionBoolean setNoPrompt() {
+		// Set the report not to prompt
 		RunOptionBoolean promptFlag = new RunOptionBoolean();
 		promptFlag.setName(RunOptionEnum.prompt);
 		promptFlag.setValue(false);
 		return promptFlag;
 	}
 
-	public String[] getReportFormat(int reportType)
-	{
-		switch (reportType)
-		{
-			case REP_HTML :
-				return new String[] { "HTML" };
+	// 导出格式 格式可以为CSV, HTMLFragment, MHT, PDF, singleXLS, XHTML, XLS, XLWA, XML,
+	// HTML
+	public String[] getReportFormat(int reportType) {
+		switch (reportType) {
+		case REP_HTML:
+			return new String[] { "HTML" };
 
-			case REP_XML :
-				return new String[] { "XML" };
+		case REP_XML:
+			return new String[] { "XML" };
 
-			case REP_PDF :
-				return new String[] { "PDF" };
+		case REP_PDF:
+			return new String[] { "PDF" };
 
-			case REP_CSV :
-				return new String[] { "CSV" };
-
-			default :
-				System.out.println(
-					"Invalid report output format."
-						+ " Must be one of: HTML, XML, PDF, CSV.");
-				return null;
+		case REP_CSV:
+			return new String[] { "CSV" };
+		case REP_XLS:
+			return new String[] { "XLS" };
+		case REP_MHT:
+			return new String[] { "MHT" };
+		case REP_XHTML:
+			return new String[] { "XHTML" };
+		case REP_XLWA:
+			return new String[] { "XLWA" };
+		case REP_singleXLS:
+			return new String[] { "singleXLS" };
+		case REP_HTMLFragment:
+			return new String[] { "HTMLFragment" };
+		default:
+			logger.info("Invalid report output format."
+					+ " Must be one of: CSV, HTMLFragment, MHT, PDF, singleXLS, XHTML, XLS, XLWA, XML, HTML.");
+			return null;
 		}
 	}
 
-	public RunOptionBoolean setDeliveryMethodEmail()
-	{
+	public RunOptionBoolean setDeliveryMethodEmail() {
 
 		RunOptionBoolean sendEmail = new RunOptionBoolean();
 
@@ -308,8 +299,7 @@ public class Email
 		return sendEmail;
 	}
 
-	public RunOptionBoolean setContinueConversation()
-	{
+	public RunOptionBoolean setContinueConversation() {
 		RunOptionBoolean continueConversation = new RunOptionBoolean();
 
 		continueConversation.setName(RunOptionEnum.continueConversation);
@@ -318,51 +308,36 @@ public class Email
 		return continueConversation;
 	}
 
-	public Contact[] getContacts(CRNConnect connection)
-	{
+	public Contact[] getContacts(CRNConnect connection) {
 
 		BaseClass baseClassArray[] = new BaseClass[] {};
-		PropEnum props[] =
-			new PropEnum[] {
-				PropEnum.searchPath,
-				PropEnum.defaultName,
-				PropEnum.email };
-		try
-		{
-			baseClassArray =
-				connection.getCMService().query(
+		PropEnum props[] = new PropEnum[] { PropEnum.searchPath,
+				PropEnum.defaultName, PropEnum.email };
+		try {
+			baseClassArray = connection.getCMService().query(
 					new SearchPathMultipleObject("CAMID(\":\")/contact"),
-					props,
-					new Sort[] {},
-					new QueryOptions());
-		}
-		catch (java.rmi.RemoteException remoteEx)
-		{
-			remoteEx.printStackTrace();
+					props, new Sort[] {}, new QueryOptions());
+		} catch (java.rmi.RemoteException remoteEx) {
+			logger.error("", remoteEx);
 		}
 
 		Contact contacts[] = new Contact[baseClassArray.length];
-		for (int i = 0; i < baseClassArray.length; i++)
-		{
-			contacts[i] = (Contact)baseClassArray[i];
+		for (int i = 0; i < baseClassArray.length; i++) {
+			contacts[i] = (Contact) baseClassArray[i];
 		}
 
 		return contacts;
 	}
 
-	public DeliveryOptionAddressSMTPArray getContactEmails(CRNConnect connection)
-	{
+	public DeliveryOptionAddressSMTPArray getContactEmails(CRNConnect connection) {
 		Contact[] contacts = getContacts(connection);
 		AddressSMTP[] emailAddress = new AddressSMTP[contacts.length];
 
-		for (int i = 0; i < contacts.length; i++)
-		{
-			if (contacts[i].getEmail().getValue() != null)
-			{
-				emailAddress[i] = new AddressSMTP(contacts[i].getEmail().getValue());
-			}
-			else
-			{
+		for (int i = 0; i < contacts.length; i++) {
+			if (contacts[i].getEmail().getValue() != null) {
+				emailAddress[i] = new AddressSMTP(contacts[i].getEmail()
+						.getValue());
+			} else {
 				emailAddress[i] = new AddressSMTP("");
 			}
 		}
@@ -375,17 +350,12 @@ public class Email
 	}
 
 	// sn_dg_sdk_task_hasSecondaryRequest_start_0
-	public boolean hasSecondaryRequest(
-		AsynchReply response,
-		String secondaryRequest)
-	{
-		AsynchSecondaryRequest[] secondaryRequests =
-			response.getSecondaryRequests();
-		for (int i = 0; i < secondaryRequests.length; i++)
-		{
-			if (secondaryRequests[i].getName().compareTo(secondaryRequest)
-				== 0)
-			{
+	public boolean hasSecondaryRequest(AsynchReply response,
+			String secondaryRequest) {
+		AsynchSecondaryRequest[] secondaryRequests = response
+				.getSecondaryRequests();
+		for (int i = 0; i < secondaryRequests.length; i++) {
+			if (secondaryRequests[i].getName().compareTo(secondaryRequest) == 0) {
 				return true;
 			}
 		}

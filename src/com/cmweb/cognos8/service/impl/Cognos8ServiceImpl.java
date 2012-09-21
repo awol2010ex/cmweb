@@ -1,11 +1,13 @@
 package com.cmweb.cognos8.service.impl;
 
-import java.math.BigInteger;
-
 import org.springframework.stereotype.Service;
 
+import com.cmweb.cognos8.BaseClassWrapper;
 import com.cmweb.cognos8.CRNConnect;
+import com.cmweb.cognos8.Email;
 import com.cmweb.cognos8.service.ICognos8Service;
+import com.cognos.developer.schemas.bibus._3.AddressSMTP;
+import com.cognos.developer.schemas.bibus._3.AsynchRequest;
 import com.cognos.developer.schemas.bibus._3.BaseClass;
 import com.cognos.developer.schemas.bibus._3.OrderEnum;
 import com.cognos.developer.schemas.bibus._3.PropEnum;
@@ -61,5 +63,11 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 				sortOptions,
 				new QueryOptions());
 	}
-	
+	// 根据报表发邮件
+	public String emailReport(CRNConnect connection, BaseClassWrapper report,
+			String bodyText, String emailSubject, int emailFormat,
+			AddressSMTP[] emails, AsynchRequest response) {
+		return new Email().emailReport(connection, report, bodyText,
+				emailSubject, emailFormat, emails, response);
+	}
 }

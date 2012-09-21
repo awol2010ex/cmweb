@@ -11,14 +11,17 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title></title>
 <jsp:include  page="/css.jsp"  flush="true" />
-
+<script type='text/javascript'
+	src='<%=request.getContextPath() %>/dwr/interface/Cognos8Dwr.js'></script>
+<script type='text/javascript'
+	src='<%=request.getContextPath() %>/dwr/engine.js'></script>
 <script type='text/javascript'>
 var tree = null; ;//报表目录树
 
 var grid=null;//报表列表
 
 var grid_manager =null; //报表列表管理器
-
+var searchPathMap ={}; //查询路径缓存
 $(function (){
 	
 	        //划分布局
@@ -116,8 +119,9 @@ $(function (){
                     			 ||
                     			 row.className =='com.cognos.developer.schemas.bibus._3.Shortcut'//报表链接
                     		  ){
+                    			  searchPathMap[row.id]=row.searchPath;//查询路径缓存
                     			  //显示发邮件按钮
-                    			  html+="<a href='#' > 发邮件 </a>";
+                    			  html+="<a href='#' onclick=\"sendMail('"+row.id+"')\"> 发邮件 </a>";
                     		  }
                     		  return html;
                     	  }
@@ -136,7 +140,37 @@ $(function (){
             });
 
            grid_manager =$("#grid").ligerGetGridManager();
+           
+           
+           
+           
+         //发送邮件
+           $("#sendMailBtn").click(function(){
+        	   
+        	   
+        	   Cognos8Dwr.emailReport(
+        			   $("#Text_sendMail_addr").val(),
+        			   $("#Text_searchPath").val(),
+        			   parseInt($("#Text_sendMail_type").val()),
+        			   $("#Text_sendMail_subject").val(),
+        			   $("#Text_sendMail_body").val(),
+        	       function(result){
+        		      alert(result);
+        		   
+        	       }
+        	   );
+           });
 });
+
+
+
+
+//发邮件
+function sendMail(id){
+	 $.ligerDialog.open({ title:"发送邮件设置",  target: $("#send_email_form") , isResize:true ,width:400,height:300});
+	 
+	 $("#Text_searchPath").val(searchPathMap[id]);//显示搜索路径
+}
 
 </script>
 </head>
@@ -158,5 +192,65 @@ $(function (){
 		<div position="top"><%=cognos8_str%></div>
 	</div>
 
+
+	<div id="send_email_form"
+		style="width: 400px; height: 200px; margin: 3px; display: none;">
+		<table width="100%">
+			<tr>
+				<td style="padding: 5px" align="left">查询路径:</td>
+				<td style="padding: 5px" align="left"><input
+					name="Text_searchPath" type="text" id="Text_searchPath"
+					ltype="text" style="width: 250px;" readonly="true" />
+				</td>
+			</tr>
+			<tr>
+				<td style="padding: 5px" align="left">发送类型:</td>
+				<td style="padding: 5px" align="left"><select
+					name="Text_sendMail_type" type="text" id="Text_sendMail_type"
+					ltype="text" style="width: 250px;">
+						<option value="0">HTML</option>
+						<option value="1">XML</option>
+						<option value="2">PDF</option>
+						<option value="3">CSV</option>
+						
+						<option value="4">XLS</option>
+						<option value="5">MHT</option>
+						<option value="6">XHTML</option>
+						<option value="7">XLWA</option>
+						
+						<option value="8">singleXLS</option>
+						<option value="9">HTMLFragment </option>
+				</select>
+				</td>
+			</tr>
+			<tr>
+				<td style="padding: 5px" align="left">发送邮件地址:</td>
+				<td style="padding: 5px" align="left"><input
+					name="Text_sendMail_addr" type="text" id="Text_sendMail_addr"
+					ltype="text" style="width: 250px;" />
+				</td>
+			</tr>
+			<tr>
+				<td style="padding: 5px" align="left">发送邮件标题:</td>
+				<td style="padding: 5px" align="left"><input
+					name="Text_sendMail_subject" type="text" id="Text_sendMail_subject"
+					ltype="text" style="width: 250px;" />
+				</td>
+			</tr>
+			<tr>
+				<td style="padding: 5px" align="left">发送邮件内容:</td>
+				<td style="padding: 5px" align="left"><input
+					name="Text_sendMail_body" type="text" id="Text_sendMail_body"
+					ltype="text" style="width: 250px;" />
+				</td>
+			</tr>
+			<tr>
+          <td colspan="2" style="padding:5px" align="center">
+              <input
+			type="button" value="发送" id="sendMailBtn"
+			class="l-button l-button-submit" />
+          </td>
+       </tr>
+	</div>
 </body>
 </html>
