@@ -1,10 +1,15 @@
 package com.cmweb.cognos8.service.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
 
 import com.cmweb.cognos8.BaseClassWrapper;
 import com.cmweb.cognos8.CRNConnect;
 import com.cmweb.cognos8.Email;
+import com.cmweb.cognos8.quartz.ITask;
+import com.cmweb.cognos8.quartz.TCmTimeTaskExecutor;
 import com.cmweb.cognos8.service.ICognos8Service;
 import com.cognos.developer.schemas.bibus._3.AddressSMTP;
 import com.cognos.developer.schemas.bibus._3.AsynchRequest;
@@ -70,4 +75,44 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 		return new Email().emailReport(connection, report, bodyText,
 				emailSubject, emailFormat, emails, response);
 	}
+	
+	
+	private static Map<String,ITask> tasks = new HashMap<String,ITask>();//当前定时任务列表
+	
+	//停止并删除定时任务
+	public synchronized void shutdown(String taskCode) throws Exception {
+		// TODO Auto-generated method stub
+		Object obj = tasks.get(taskCode);
+
+		if (obj == null) {
+			return;
+		}
+
+		ITask task = (ITask) obj;
+		task.stopTask();
+		tasks.remove(taskCode);
+	}
+	
+	
+	//加到定时任务队列
+	public synchronized void addTask(String taskScheduleId, ITask task) {
+		tasks.put(taskScheduleId, task);
+	}
+	//初始化定时任务
+	public void init() throws Exception{
+		
+	}
+	
+	//启动某一任务
+	public ITask startTask(String taskCode, String express) throws Exception{
+		return null;
+	}
+	
+	//取得一个定时任务实例
+	public ITask getInstance(String taskScheduleId) throws Exception {
+		
+		ITask task = new TCmTimeTaskExecutor(taskScheduleId);
+		return task;
+	}
+	
 }

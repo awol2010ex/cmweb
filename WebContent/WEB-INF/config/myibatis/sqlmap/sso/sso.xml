@@ -5,7 +5,7 @@
 <mapper namespace="com.cmweb.sso">
 <!--  密码验证 -->
 	<select id="authDB" parameterType="map" resultType="int">
-	SELECT  count(1)  as A  from VW_CAS_USERS_DB_NOW  where login_id=#{login_id}  and  USER_PSWD =#{password}
+	SELECT  count(1)  as A  from VW_CAS_USERS_BASE_T  where login_id=#{login_id}  and  USER_PSWD =#{password}
 	   
 	
 	</select>
@@ -43,7 +43,7 @@
 	<!-- 取得账户信息 -->
 	<select id="getStaffList" parameterType="map" resultType="map">
 		
-	 SELECT  *  from VW_CAS_USERS_DB_NOW  where login_id=#{login_id} 
+	 SELECT  *  from VW_CAS_USERS_BASE_T  where login_id=#{login_id} 
 	
 	</select>
 	
