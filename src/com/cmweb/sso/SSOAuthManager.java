@@ -188,4 +188,11 @@ public class SSOAuthManager {
 			throws Exception {
 		return ssoSqlSession.selectList("com.cmweb.sso.searchUser", map);
 	}
+	
+	//机构部门搜索
+	@SuppressWarnings("unchecked")
+	public List<Map<String, Object>> searchUnit(Map<String, Object> map)
+			throws Exception {
+		return ssoSqlSession.selectList("com.cmweb.sso.searchUnit", map);
+	}
 }

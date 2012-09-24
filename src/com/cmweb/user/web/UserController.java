@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.cmweb.cognos8.CRNConnect;
 import com.cmweb.cognos8.CRNConnectFactory;
 import com.cmweb.cognos8.service.ICognos8Service;
-
+//用户相关操作展示类
 @Controller
 @RequestMapping(value = "/user")
 public class UserController {
