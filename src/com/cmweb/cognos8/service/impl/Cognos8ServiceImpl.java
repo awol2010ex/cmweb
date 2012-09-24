@@ -1,16 +1,22 @@
 package com.cmweb.cognos8.service.impl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cmweb.cognos8.BaseClassWrapper;
 import com.cmweb.cognos8.CRNConnect;
 import com.cmweb.cognos8.Email;
+import com.cmweb.cognos8.dao.ITCmTimeTaskDAO;
 import com.cmweb.cognos8.quartz.ITask;
 import com.cmweb.cognos8.quartz.TCmTimeTaskExecutor;
 import com.cmweb.cognos8.service.ICognos8Service;
+import com.cmweb.cognos8.vo.TCmTimeTaskVO;
 import com.cognos.developer.schemas.bibus._3.AddressSMTP;
 import com.cognos.developer.schemas.bibus._3.AsynchRequest;
 import com.cognos.developer.schemas.bibus._3.BaseClass;
@@ -24,6 +30,11 @@ import com.cognos.developer.schemas.bibus._3.XmlEncodedXML;
 //cognos 8 逻辑层操作
 @Service
 public class Cognos8ServiceImpl implements ICognos8Service {
+	private final static Logger logger = LoggerFactory
+	.getLogger(Cognos8ServiceImpl.class);
+	@Autowired
+	ITCmTimeTaskDAO tCmTimeTaskDAO; //定时任务DAO
+	
 	//登陆cognos
 	@Override
 	public void quickLogon(CRNConnect connection, String namespace,
@@ -98,20 +109,50 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 	public synchronized void addTask(String taskScheduleId, ITask task) {
 		tasks.put(taskScheduleId, task);
 	}
-	//初始化定时任务
-	public void init() throws Exception{
+	//启动服务时初始化定时任务
+	public void init() throws Exception {
+		// TODO Auto-generated method stub
+
+		List<TCmTimeTaskVO> list=tCmTimeTaskDAO.getAll();
 		
+		if(list!=null&&list.size()>0){
+			
+			for(TCmTimeTaskVO vo:list){
+				String taskName=vo.getTaskname();
+				logger.info("开始启动定时任务--"+taskName);
+				this.startTask(vo.getId(), vo.getCron());
+				logger.info("结束启动定时任务--"+taskName);
+			}
+		}
 	}
-	
-	//启动某一任务
-	public ITask startTask(String taskCode, String express) throws Exception{
+	//启动定时任务
+	public ITask startTask(String taskCode, String express) 
+			throws Exception {
+		// TODO Auto-generated method stub
+		ITask task = null;
+		
+		
+		TCmTimeTaskVO svo=null;
+		try{
+		   svo=tCmTimeTaskDAO.getTask(taskCode);//取得任务信息
+		}catch(Exception e){
+			throw new Exception(e);
+		}
+		if(svo!=null){
+			//启动任务
+			task = getInstance(taskCode);
+			task.startTask(svo.getCron());
+			addTask(taskCode, task);
+		}
+		
 		return null;
 	}
 	
+	
 	//取得一个定时任务实例
-	public ITask getInstance(String taskScheduleId) throws Exception {
+	public ITask getInstance(String taskCode) throws Exception {
 		
-		ITask task = new TCmTimeTaskExecutor(taskScheduleId);
+		ITask task = new TCmTimeTaskExecutor(taskCode);
 		return task;
 	}
 	
