@@ -31,61 +31,21 @@
    </appender>
 
    <appender name="FILE" class="org.apache.log4j.RollingFileAppender">
-     <param name="File" value="../logs/vysper_server.log"/>
+     <param name="File" value="../logs/cmweb.log"/>
      <param name="Append" value="true"/>
      <param name="MaxFileSize" value="500KB"/>
-     <param name="MaxBackupIndex" value="1"/>
-     <param name="Threshold" value="INFO"/>
+     <param name="MaxBackupIndex" value="10"/>
+     <param name="Threshold" value="DEBUG"/>
 
      <layout class="org.apache.log4j.PatternLayout">
        <param name="ConversionPattern" value="%d{HH:mm:ss,SSS} | %-5p | %c | %m%n"/>
      </layout>
    </appender>
-
-   <appender name="STANZA" class="org.apache.log4j.RollingFileAppender">
-     <param name="File" value="../logs/stanza.log"/>
-     <param name="Append" value="true"/>
-     <param name="MaxFileSize" value="500KB"/>
-     <param name="MaxBackupIndex" value="1"/>
-     <param name="Threshold" value="INFO"/>
-
-     <layout class="org.apache.log4j.PatternLayout">
-       <param name="ConversionPattern" value="%-5p %d{HH:mm:ss,SSS} | %c{1} | %m%n"/>
-     </layout>
-   </appender>
-
    <!-- limit logging for spring -->
    <category name="org.springframework">
-     <priority value="INFO"/>
-     <appender-ref ref="FILE" />  
-   </category>
-
-   <!-- limit logging for mina -->
-   <category name="org.apache.mina">
-     <priority value="WARN"/>
-     <appender-ref ref="FILE" />  
-   </category>
-   <category name="org.apache.vysper.mina">
-     <priority value="WARN"/>
-     <appender-ref ref="FILE" />  
-   </category>
-
-   <!-- limit logging for jackrabbit -->
-   <category name="org.apache.jackrabbit">
-     <priority value="INFO"/>
-     <appender-ref ref="FILE" />  
-   </category>
-
-   <category name="org.apache.vysper">
      <priority value="DEBUG"/>
      <appender-ref ref="FILE" />  
    </category>
-
-   <category name="stanza">
-     <priority value="INFO"/>
-     <appender-ref ref="STANZA" />  
-   </category>
-
 
     <category name="com.cmweb">
      <priority value="DEBUG"/>

@@ -66,8 +66,7 @@ public class SSOAuthManager {
 		try {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("DOMAIN_NAME", DOMAIN_NAME);// 域名
-			return ssoSqlSession
-					.selectList("com.cmweb.sso.getSvrList", map);
+			return ssoSqlSession.selectList("com.cmweb.sso.getSvrList", map);
 		} catch (Exception e) {
 			logger.error("", e);
 			return null;
@@ -188,8 +187,8 @@ public class SSOAuthManager {
 			throws Exception {
 		return ssoSqlSession.selectList("com.cmweb.sso.searchUser", map);
 	}
-	
-	//机构部门搜索
+
+	// 机构部门搜索
 	@SuppressWarnings("unchecked")
 	public List<Map<String, Object>> searchUnit(Map<String, Object> map)
 			throws Exception {

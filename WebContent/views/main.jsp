@@ -146,14 +146,13 @@ $(function (){
            
          //发送邮件
            $("#sendMailBtn").click(function(){
-        	   
-        	   
         	   Cognos8Dwr.emailReport(
         			   $("#Text_sendMail_addr").val(),
         			   $("#Text_searchPath").val(),
         			   parseInt($("#Text_sendMail_type").val()),
         			   $("#Text_sendMail_subject").val(),
         			   $("#Text_sendMail_body").val(),
+        			   $("#Text_sendMail_org").ligerGetComboBoxManager().getValue(),
         	       function(result){
         		      alert(result);
         		   
@@ -165,7 +164,8 @@ $(function (){
            $("#Text_sendMail_org").ligerComboBox({
                width: 250,
                selectBoxWidth: 250,
-               selectBoxHeight: 400, valueField: 'id',textField: 'name', treeLeafOnly: false,
+               selectBoxHeight: 400, valueField: 'UID',textField: 'name', treeLeafOnly: false,
+               split:",",
                absolute:false,
                tree: { 
             	   url: '<%=contextPath%>/restful/org/list/',

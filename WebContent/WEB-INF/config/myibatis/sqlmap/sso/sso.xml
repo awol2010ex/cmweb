@@ -51,7 +51,7 @@
 	<!-- 用户搜索 -->
     <select id="searchUser" parameterType="map" resultType="map">
 		
-	 SELECT  USER_NAME FIRST_NAME ,USER_NAME LAST_NAME ,USER_NAME  NICK_NAME ,OFFICE_EMAIL EMAIL ,LOGIN_ID||'@ghac.cn' JID  from VW_CAS_USERS_BASE_T  where 1=1 
+	 SELECT  USER_NAME FIRST_NAME ,USER_NAME LAST_NAME ,USER_NAME  NICK_NAME ,OFFICE_EMAIL EMAIL  from VW_CAS_USERS_BASE_T  where  user_src='AD'
 	 
 	 <if test="FIRST_NAME!=null and FIRST_NAME!=''">    
          AND USER_NAME  like   '%${FIRST_NAME}%'
@@ -65,7 +65,12 @@
      <if test="EMAIL!=null and EMAIL!=''">    
          AND OFFICE_EMAIL  like   '%${EMAIL}%'
      </if> 
-     
+      <if test="PID!=null and PID!=''">    
+         AND ORG_ID in (${PID})
+     </if>
+	 <if test="PID==null or PID==''">    
+         AND ORG_ID IS NULL
+     </if>
 	</select>
 	
 	
