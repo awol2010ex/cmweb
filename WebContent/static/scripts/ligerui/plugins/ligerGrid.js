@@ -736,7 +736,6 @@
             $(".l-bar-btnload span", g.toolbar).addClass("l-disabled");
             if (p.dataType == "local") {
                 
-                debugger
                 g.filteredData = g.data = p.data;
                 if (clause)
                     g.filteredData[p.root] = g._searchData(g.filteredData[p.root], clause);

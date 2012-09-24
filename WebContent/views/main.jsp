@@ -15,12 +15,20 @@
 	src='<%=request.getContextPath() %>/dwr/interface/Cognos8Dwr.js'></script>
 <script type='text/javascript'
 	src='<%=request.getContextPath() %>/dwr/engine.js'></script>
+	
+<script type="text/javascript" src="<%=contextPath%>/static/scripts/draggable.js"></script> 	
+	
 <script type='text/javascript'>
 var tree = null; ;//报表目录树
 
 var grid=null;//报表列表
 
 var grid_manager =null; //报表列表管理器
+
+var selected_grid =null ;//已选报表列表
+
+var selected_grid_manager =null ;//已选报表列表管理器
+
 var searchPathMap ={}; //查询路径缓存
 $(function (){
 	
@@ -28,6 +36,7 @@ $(function (){
             $("#layout1").ligerLayout({
                 minLeftWidth:100,
                 leftWidth: 300,
+                rightWidth:300,
                 minRightWidth:80
             });
 	        
@@ -83,6 +92,8 @@ $(function (){
            
           //报表列表
            grid=$("#grid").ligerGrid({
+        	    checkbox: true,
+
                 columns: [
                       {
                     	  
@@ -97,12 +108,7 @@ $(function (){
                       },
                       {
                     	  
-                    	  display: '类型', name: 'className', isAllowHide: true ,align:"left" ,
-                    	  render: function (row)
-                          {
-                              return row.className;
-                          }
-
+                    	  display: '类型', name: 'className', isAllowHide: true ,align:"left"
                     	  
                       }
                       
@@ -135,7 +141,8 @@ $(function (){
                 height:"90%",
                 enabledEdit: false,
                 pageSizeOptions: [10,50,100],
-                colDraggable:true
+                colDraggable:true,
+                rowDraggable: true
 
             });
 
@@ -143,6 +150,43 @@ $(function (){
            
            
            
+         //已选报表列表
+           selected_grid=$("#selected_grid").ligerGrid({
+        	    checkbox: true,
+                columns: [
+                      {
+                    	  
+                    	  display: '名称', name: 'name', isAllowHide: true ,align:"left" ,
+                    	  render: function (row)
+                          {
+                              var html = "<img src='"+row.icon+"' style='width:12px;height:12px;' />&nbsp;"+row.name;
+                              return html;
+                          }
+
+                    	  
+                      },
+                      {
+                    	  
+                    	  display: '类型', name: 'className', isAllowHide: true ,align:"left" ,
+                    	  
+                      }
+                ],
+                data:{Total:0 ,Rows:[]},
+                sortName: 'id',
+                showTitle: false,
+                usePager:false,
+                height:"90%",
+                enabledEdit: false,
+                colDraggable:true,
+                rowDraggable: true
+
+            });
+
+           selected_grid_manager =$("#selected_grid").ligerGetGridManager();
+           
+           //拖动行为
+           gridDraggable(grid ,selected_grid);
+
            
          //发送邮件
            $("#sendMailBtn").click(function(){
@@ -242,6 +286,10 @@ function sendMail(id){
 
 		</div>
 		<div position="top"><%=cognos8_str%></div>
+		
+		<div position="right" title="已选报表列表">
+		     <div id="selected_grid"  ></div>
+		</div>
 	</div>
 
 
