@@ -72,7 +72,7 @@
 	<!-- 搜索机构部门 -->
 	
 	<select id="searchUnit" parameterType="map" resultType="map">
-	    select org_id  uid ,org_name name ,  PARENT_ORG_ID  pid   from VW_CAS_ORGS where org_src='AD'
+	    select org_id  uid ,org_name name , ORG_CODE, PARENT_ORG_ID  pid   from VW_CAS_ORGS where org_src='AD'
 	     <if test="PID!=null and PID!=''">    
          AND PARENT_ORG_ID = #{PID}
          </if>

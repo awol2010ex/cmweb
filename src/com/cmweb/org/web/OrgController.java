@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +39,7 @@ public class OrgController {
 			map.put("PID", pid);// 父节点ID
 		}
 
-		
-		//搜索机构列表
+		// 搜索机构列表
 		List<Map<String, Object>> orgList = null;
 		try {
 			orgList = ssoAuthManager.searchUnit(map);
@@ -47,14 +47,25 @@ public class OrgController {
 			// TODO Auto-generated catch block
 			logger.error("", e);
 		}
+		JSONArray result = new JSONArray();
+		if (orgList != null && orgList.size() > 0) {
 
-		if(orgList!=null ){
-			try {
-				response.getWriter().print(JSONArray.fromObject(orgList));//输出机构列表
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				logger.error("",e);
+			for (Map<String, Object> m : orgList) {
+				result.add(JSONObject.fromObject(m)
+						.element("id", (String) m.get("ORG_CODE"))// 机构32位code
+						.element("name", (String) m.get("NAME"))// 机构名
+						.element("isexpand", false)
+						// 不自动展开
+						.element("children", new JSONArray()));
 			}
+
+		}
+
+		try {// 输出机构列表
+			response.getWriter().print(result);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			logger.error("", e);
 		}
 	}
 }

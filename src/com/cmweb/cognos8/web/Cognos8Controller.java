@@ -68,7 +68,6 @@ public class Cognos8Controller {
 									// 节点名称
 									.element("isexpand", false)
 									// 不自动展开
-									// 图标
 									.element("children", new JSONArray())
 									// 类型
 									.element("className",
