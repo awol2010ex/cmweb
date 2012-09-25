@@ -14,9 +14,7 @@
 <script type='text/javascript'
 	src='<%=request.getContextPath() %>/dwr/interface/Cognos8Dwr.js'></script>
 <script type='text/javascript'
-	src='<%=request.getContextPath() %>/dwr/engine.js'></script>
-	
-<script type="text/javascript" src="<%=contextPath%>/static/scripts/draggable.js"></script> 	
+	src='<%=request.getContextPath() %>/dwr/engine.js'></script>	
 	
 <script type='text/javascript'>
 var tree = null; ;//报表目录树
@@ -90,6 +88,10 @@ $(function (){
 					});
            
            
+           //标签页
+            $("#navtab1").ligerTab();
+           
+           
           //报表列表
            grid=$("#grid").ligerGrid({
         	    checkbox: true,
@@ -141,8 +143,9 @@ $(function (){
                 height:"90%",
                 enabledEdit: false,
                 pageSizeOptions: [10,50,100],
-                colDraggable:true,
-                rowDraggable: true
+                rownumbers:true,
+
+                colDraggable:true
 
             });
 
@@ -152,6 +155,8 @@ $(function (){
            
          //已选报表列表
            selected_grid=$("#selected_grid").ligerGrid({
+        	    rownumbers:true,
+
         	    checkbox: true,
                 columns: [
                       {
@@ -164,28 +169,19 @@ $(function (){
                           }
 
                     	  
-                      },
-                      {
-                    	  
-                    	  display: '类型', name: 'className', isAllowHide: true ,align:"left" ,
-                    	  
                       }
                 ],
                 data:{Total:0 ,Rows:[]},
                 sortName: 'id',
                 showTitle: false,
-                usePager:false,
+                usePager:true,
                 height:"90%",
                 enabledEdit: false,
-                colDraggable:true,
-                rowDraggable: true
-
+                colDraggable:true
             });
 
            selected_grid_manager =$("#selected_grid").ligerGetGridManager();
-           
-           //拖动行为
-           gridDraggable(grid ,selected_grid);
+          
 
            
          //发送邮件
@@ -280,10 +276,13 @@ function sendMail(id){
               </div>
 
 		</div>
-		<div position="center" title="报表列表">
-              <div id="grid"></div>
-			
-
+		<div position="center" >
+		   <div id="navtab1" style=" border:1px solid #A3C0E8; ">
+		     <div  title="报表列表">
+		     
+                <div id="grid"></div>
+			 </div>
+           </div>
 		</div>
 		<div position="top"><%=cognos8_str%></div>
 		
