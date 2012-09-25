@@ -201,7 +201,13 @@
         }
         else
         {
-            return value.toString();
+        	if(value.time){//根据ibtais 输出的格式
+        	   var format = column.format || this.options.dateFormat || "yyyy-MM-dd";
+               return getFormatDate(new Date(value.time), format);
+        	}
+        	else{
+               return value.toString();
+        	}
         }
     }
 

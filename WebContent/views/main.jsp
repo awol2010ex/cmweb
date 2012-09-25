@@ -28,6 +28,8 @@ var selected_grid =null ;//已选报表列表
 var selected_grid_manager =null ;//已选报表列表管理器
 
 var searchPathMap ={}; //查询路径缓存
+
+var navtab =null ;//标签页管理器
 $(function (){
 	
 	        //划分布局
@@ -89,8 +91,8 @@ $(function (){
            
            
            //标签页
-            $("#navtab1").ligerTab();
-           
+            $("#navtab1").ligerTab({changeHeightOnResize:true,dragToMove:true,dblClickToClose:true});
+            navtab = $("#navtab1").ligerGetTabManager();
            
           //报表列表
            grid=$("#grid").ligerGrid({
@@ -129,7 +131,8 @@ $(function (){
                     		  ){
                     			  searchPathMap[row.id]=row.searchPath;//查询路径缓存
                     			  //显示发邮件按钮
-                    			  html+="<a href='#' onclick=\"sendMail('"+row.id+"')\"> 发邮件 </a>";
+                    			  html+="<a href='#' onclick=\"sendMail('"+row.id+"')\"> 发邮件 </a>&nbsp;"
+                    			  +"<a href='#' onclick=\"viewLog('"+row.id+"')\"> 查看日志 </a>&nbsp;";
                     		  }
                     		  return html;
                     	  }
@@ -263,7 +266,10 @@ function sendMail(id){
 	 
 	 $("#Text_searchPath").val(searchPathMap[id]);//显示搜索路径
 }
-
+//查看日志
+function viewLog(id){
+	 navtab.addTabItem({text:"查看日志",url:'<%=contextPath%>/views/log/log_list.jsp?reportid='+id,height:"90%"});
+}
 </script>
 </head>
 <body >
@@ -277,7 +283,7 @@ function sendMail(id){
 
 		</div>
 		<div position="center" >
-		   <div id="navtab1" style=" border:1px solid #A3C0E8; ">
+		   <div id="navtab1" style=" border:1px solid #A3C0E8; height:100%;">
 		     <div  title="报表列表">
 		     
                 <div id="grid"></div>

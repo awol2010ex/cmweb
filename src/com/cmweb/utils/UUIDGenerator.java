@@ -4,7 +4,7 @@ import java.net.InetAddress;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+//UUID生成器
 public class UUIDGenerator {
 	private final static Logger logger = LoggerFactory
 			.getLogger(UUIDGenerator.class);

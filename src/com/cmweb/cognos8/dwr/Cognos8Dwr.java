@@ -1,5 +1,8 @@
 package com.cmweb.cognos8.dwr;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.cmweb.cognos8.BaseClassWrapper;
 import com.cmweb.cognos8.CRNConnect;
 import com.cmweb.cognos8.service.ICognos8Service;
+import com.cmweb.cognos8.vo.TCmTimeTaskLogDtlVO;
+import com.cmweb.cognos8.vo.TCmTimeTaskLogVO;
 import com.cmweb.sso.SSOAuthManager;
+import com.cmweb.utils.UUIDGenerator;
 import com.cognos.developer.schemas.bibus._3.AddressSMTP;
 import com.cognos.developer.schemas.bibus._3.BaseClass;
 
@@ -35,9 +41,15 @@ public class Cognos8Dwr {
 
 		CRNConnect connection = (CRNConnect) currentUser.getSession()
 				.getAttribute("connection");
+
+		String returnStr = null;// 返回结果
+
+		AddressSMTP[] smtpList = null;// 邮箱列表
+
+		BaseClass report = null;// 报表对象
 		if (connection != null) {
 			// 取得报表对象
-			BaseClass report = null;// 报表对象
+
 			try {
 				BaseClass[] queryList = cognos8Service.getChildren(connection,
 						searchPath);
@@ -76,7 +88,7 @@ public class Cognos8Dwr {
 						}
 
 						// 邮箱地址列表
-						AddressSMTP[] smtpList = new AddressSMTP[len];
+						smtpList = new AddressSMTP[len];
 						for (int i = 0, s = emailsTokens.length; i < s; i++) {// 填写的邮箱地址
 							smtpList[i] = new AddressSMTP(emailsTokens[i]);
 						}
@@ -89,22 +101,62 @@ public class Cognos8Dwr {
 							}
 						}
 						// 发送邮件
-						return cognos8Service.emailReport(connection,
+						returnStr = cognos8Service.emailReport(connection,
 								reportObject, body, subject, type, smtpList,
 								null);
 					} else {
-						return "邮件地址不正确";
+						returnStr = "邮件地址不正确";
 					}
 
 				} else {
-					return "邮件地址不正确";
+					returnStr = "邮件地址不正确";
 				}
 			} else {
-				return "找不到报表";
+				returnStr = "找不到报表";
 			}
 
-		} else
+		} else {
 
-			return "连接超时或未登录";
+			returnStr = "连接超时或未登录";
+		}
+
+		// 保存日志
+		TCmTimeTaskLogVO log = new TCmTimeTaskLogVO();
+		log.setId(UUIDGenerator.generate());
+		log.setCreatedDatetime(new Timestamp(new Date().getTime()));
+		log.setSender((String)currentUser.getSession().getAttribute("j_username"));//发送人
+		if (report != null) {
+			log.setReportName(report.getDefaultName().getValue());// 报表名
+			log.setSearchPath(report.getSearchPath().getValue());// 搜索路径
+			log.setReportid(report.getStoreID().getValue().getValue());//报表ID
+		}
+		log.setLogresult(returnStr);// 日志信息
+
+		try {
+			cognos8Service.saveLog(log);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			logger.error("", e);
+		}
+		// 保存日志明细
+		if (smtpList != null && smtpList.length > 0) {
+			List<TCmTimeTaskLogDtlVO> dtl_list =new ArrayList<TCmTimeTaskLogDtlVO>();
+			for (AddressSMTP smtp : smtpList) {
+				TCmTimeTaskLogDtlVO log_dtl = new TCmTimeTaskLogDtlVO();
+				log_dtl.setId(UUIDGenerator.generate());
+				log_dtl.setLogid(log.getId());
+				log_dtl.setEmail(smtp.getValue());//邮箱地址
+				dtl_list.add(log_dtl);
+			}
+			try {
+				cognos8Service.saveLogDtl(dtl_list);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				logger.error("",e);
+			}
+		}
+
+		//
+		return returnStr;
 	}
 }

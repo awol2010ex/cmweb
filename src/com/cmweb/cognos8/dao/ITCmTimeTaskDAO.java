@@ -10,5 +10,5 @@ public interface ITCmTimeTaskDAO {
 	public TCmTimeTaskVO getTask(String taskCode) throws Exception;
 	
 	//取得所有定时任务
-	public List<TCmTimeTaskVO> getAll()throws Exception;
+	public List<TCmTimeTaskVO> getAll() throws Exception;
 }

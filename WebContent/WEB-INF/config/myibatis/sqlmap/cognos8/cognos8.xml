@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cmweb.cognos8">
+<!--  取得发送日志列表 -->
+	<select id="getLogList" parameterType="map" resultType="map">
+	    select  * from T_CM_TIME_TASK_LOG where reportid =#{reportid}
+    </select>
+    <!--  取得发送日志行数 -->
+    <select id="getLogCount" parameterType="map" resultType="int">
+	    select  count(1) from T_CM_TIME_TASK_LOG where reportid =#{reportid}
+    </select>
+</mapper>

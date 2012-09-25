@@ -1,5 +1,9 @@
 package com.cmweb.cognos8.web;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -219,6 +223,37 @@ public class Cognos8Controller {
 				// TODO Auto-generated catch block
 				logger.error("", e);
 			}
+		}
+
+	}
+
+	// 日志列表
+	@RequestMapping(value = "/log/list")
+	public void getLogList(HttpServletRequest request,
+			HttpServletResponse response, int page, int pagesize) {
+
+		String reportid = request.getParameter("reportid");// 报表ID
+		JSONObject result = new JSONObject().element("Total", 0).element(
+				"Rows", new JSONArray());
+		if (reportid != null) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("reportid", reportid);
+
+			//分页查询结果
+			try {
+				result = cognos8Service.getLogList(map, (page - 1) * pagesize,
+						pagesize);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				logger.error("", e);
+			}
+
+		}
+		try {
+			response.getWriter().print(result.toString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			logger.error("", e);
 		}
 
 	}
