@@ -202,4 +202,27 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 
 		return result;
 	}
+	
+	//取得定时任务
+	public TCmTimeTaskVO  getTimeTask(String id)throws Exception{
+		return tCmTimeTaskDAO.getTask(id);
+		
+	}
+	
+	//保存定时任务
+	@Transactional
+	public void  saveTimeTask(TCmTimeTaskVO  vo)throws Exception{
+		tCmTimeTaskDAO.save(vo);
+	}
+	
+	//取得定时任务列表 
+	public JSONObject getTimeTaskList(Map<String,Object> map,int offset ,int pagesize) throws Exception{
+		JSONObject result = new JSONObject();
+
+		result.put("Total", tCmTimeTaskDAO.getTimeTaskCount(map));// 总行数
+		result.put("Rows", JSONArray.fromObject(tCmTimeTaskDAO
+				.getTimeTaskList(map, offset, pagesize)));// 当前页查询结构
+
+		return result;
+	}
 }

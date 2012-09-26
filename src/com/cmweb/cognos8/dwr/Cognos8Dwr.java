@@ -19,6 +19,7 @@ import com.cmweb.cognos8.CRNConnect;
 import com.cmweb.cognos8.service.ICognos8Service;
 import com.cmweb.cognos8.vo.TCmTimeTaskLogDtlVO;
 import com.cmweb.cognos8.vo.TCmTimeTaskLogVO;
+import com.cmweb.cognos8.vo.TCmTimeTaskVO;
 import com.cmweb.sso.SSOAuthManager;
 import com.cmweb.utils.UUIDGenerator;
 import com.cognos.developer.schemas.bibus._3.AddressSMTP;
@@ -124,11 +125,12 @@ public class Cognos8Dwr {
 		TCmTimeTaskLogVO log = new TCmTimeTaskLogVO();
 		log.setId(UUIDGenerator.generate());
 		log.setCreatedDatetime(new Timestamp(new Date().getTime()));
-		log.setSender((String)currentUser.getSession().getAttribute("j_username"));//发送人
+		log.setSender((String) currentUser.getSession().getAttribute(
+				"j_username"));// 发送人
 		if (report != null) {
 			log.setReportName(report.getDefaultName().getValue());// 报表名
 			log.setSearchPath(report.getSearchPath().getValue());// 搜索路径
-			log.setReportid(report.getStoreID().getValue().getValue());//报表ID
+			log.setReportid(report.getStoreID().getValue().getValue());// 报表ID
 		}
 		log.setLogresult(returnStr);// 日志信息
 
@@ -140,23 +142,62 @@ public class Cognos8Dwr {
 		}
 		// 保存日志明细
 		if (smtpList != null && smtpList.length > 0) {
-			List<TCmTimeTaskLogDtlVO> dtl_list =new ArrayList<TCmTimeTaskLogDtlVO>();
+			List<TCmTimeTaskLogDtlVO> dtl_list = new ArrayList<TCmTimeTaskLogDtlVO>();
 			for (AddressSMTP smtp : smtpList) {
 				TCmTimeTaskLogDtlVO log_dtl = new TCmTimeTaskLogDtlVO();
 				log_dtl.setId(UUIDGenerator.generate());
 				log_dtl.setLogid(log.getId());
-				log_dtl.setEmail(smtp.getValue());//邮箱地址
+				log_dtl.setEmail(smtp.getValue());// 邮箱地址
 				dtl_list.add(log_dtl);
 			}
 			try {
 				cognos8Service.saveLogDtl(dtl_list);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				logger.error("",e);
+				logger.error("", e);
 			}
 		}
 
 		//
 		return returnStr;
+	}
+	
+	
+	// 保存数据源
+	public boolean saveTimeTask(TCmTimeTaskVO vo) {
+		try {
+			TCmTimeTaskVO bean =new TCmTimeTaskVO();
+			if (vo.getId() == null || "".equals(vo.getId().trim())) {//新建
+				bean = vo;
+				bean.setId(UUIDGenerator.generate());
+				bean.setCreateddatetime(new Timestamp(new Date().getTime()));//新建时间
+				
+			}
+			else{//修改
+				try{
+				     bean =cognos8Service.getTimeTask(vo.getId().trim());//取得定时任务信息
+				     bean.setCron(vo.getCron());//cron表达式
+				     bean.setLastupdateddatetime(new Timestamp(new Date().getTime()));//最后修改时间
+				     bean.setTaskname(vo.getTaskname());//任务名
+				    
+				}catch(Exception e){
+					logger.error("",e);
+				}
+			}
+			
+			bean.setLastupdateddatetime(bean.getCreateddatetime());//最后修改时间
+			
+			
+			Subject currentUser = SecurityUtils.getSubject();
+			bean.setUsername((String)currentUser.getSession().getAttribute("j_username"));//登陆用户名
+			bean.setPassword((String)currentUser.getSession().getAttribute("j_password"));//登陆用户名
+			
+			
+			cognos8Service.saveTimeTask(bean);//保存到数据库
+		} catch (Exception e) {
+			logger.error("", e);
+			return false;
+		}
+		return true;
 	}
 }

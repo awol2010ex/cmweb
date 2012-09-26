@@ -46,4 +46,18 @@ GROUP BY
     <select id="getLogDtlList" parameterType="map" resultType="map">
 	    select  * from T_CM_TIME_TASK_LOG_DTL where logid =#{logid} order by EMAIL
     </select>
+    
+    
+    
+    
+    
+     <!--  取得定时任务行数 -->
+    <select id="getTimeTaskCount" parameterType="map" resultType="int">
+	    select  count(1) from T_CM_TIME_TASK 
+    </select>
+    
+    <!--  取得定时任务列表 -->
+    <select id="getTimeTaskList" parameterType="map" resultType="map">
+	    select  * from T_CM_TIME_TASK order by createddatetime desc
+    </select>
 </mapper>

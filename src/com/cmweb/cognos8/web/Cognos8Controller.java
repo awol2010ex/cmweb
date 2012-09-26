@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.cmweb.cognos8.CRNConnect;
 import com.cmweb.cognos8.service.ICognos8Service;
+import com.cmweb.cognos8.vo.TCmTimeTaskVO;
 import com.cognos.developer.schemas.bibus._3.Analysis;
 import com.cognos.developer.schemas.bibus._3.BaseClass;
 import com.cognos.developer.schemas.bibus._3.Folder;
@@ -239,7 +240,7 @@ public class Cognos8Controller {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("reportid", reportid);
 
-			//分页查询结果
+			// 分页查询结果
 			try {
 				result = cognos8Service.getLogList(map, (page - 1) * pagesize,
 						pagesize);
@@ -257,6 +258,7 @@ public class Cognos8Controller {
 		}
 
 	}
+
 	// 日志明细列表
 	@RequestMapping(value = "/log/dtl/list")
 	public void getLogDtlList(HttpServletRequest request,
@@ -269,16 +271,64 @@ public class Cognos8Controller {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("logid", logid);
 
-			//分页查询结果
+			// 分页查询结果
 			try {
-				result = cognos8Service.getLogDtlList(map, (page - 1) * pagesize,
-						pagesize);
+				result = cognos8Service.getLogDtlList(map, (page - 1)
+						* pagesize, pagesize);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				logger.error("", e);
 			}
 
 		}
+		try {
+			response.getWriter().print(result.toString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			logger.error("", e);
+		}
+	}
+
+	// 定时任务修改页面
+	@RequestMapping(value = "/timetask/edit")
+	public String timeTaskEdit(HttpServletRequest request) {
+
+		String id = request.getParameter("id");
+		TCmTimeTaskVO bean = null;
+		if (id != null) {
+			try {
+				bean = cognos8Service.getTimeTask(id);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				logger.error("", e);
+			}
+		}
+		if (bean != null) {
+			request.setAttribute("bean", bean);
+		} else {
+			request.setAttribute("bean", new TCmTimeTaskVO());
+		}
+		return "timetask/timeTaskEdit";
+	}
+
+	// 定时任务列表
+	@RequestMapping(value = "/timetask/list")
+	public void getTimeTaskList(HttpServletRequest request,
+			HttpServletResponse response, int page, int pagesize) {
+
+		JSONObject result = new JSONObject().element("Total", 0).element(
+				"Rows", new JSONArray());
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		// 分页查询结果
+		try {
+			result = cognos8Service.getTimeTaskList(map, (page - 1) * pagesize,
+					pagesize);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			logger.error("", e);
+		}
+
 		try {
 			response.getWriter().print(result.toString());
 		} catch (IOException e) {

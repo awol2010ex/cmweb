@@ -26,6 +26,8 @@ public class TCmTimeTaskVO implements java.io.Serializable{
 	
 	private Timestamp createddatetime ;// 创建时间
 	
+	private Timestamp lastupdateddatetime ;// 最后修改时间
+	
 	private String username ;
 	
 	private String password ;
@@ -80,5 +82,13 @@ public class TCmTimeTaskVO implements java.io.Serializable{
 
 	public void setCron(String cron) {
 		this.cron = cron;
+	}
+	@Column(name = "lastupdateddatetime")
+	public Timestamp getLastupdateddatetime() {
+		return lastupdateddatetime;
+	}
+
+	public void setLastupdateddatetime(Timestamp lastupdateddatetime) {
+		this.lastupdateddatetime = lastupdateddatetime;
 	}
 }

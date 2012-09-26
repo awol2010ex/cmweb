@@ -10,6 +10,7 @@ import com.cmweb.cognos8.CRNConnect;
 import com.cmweb.cognos8.quartz.ITask;
 import com.cmweb.cognos8.vo.TCmTimeTaskLogDtlVO;
 import com.cmweb.cognos8.vo.TCmTimeTaskLogVO;
+import com.cmweb.cognos8.vo.TCmTimeTaskVO;
 import com.cognos.developer.schemas.bibus._3.AddressSMTP;
 import com.cognos.developer.schemas.bibus._3.AsynchRequest;
 import com.cognos.developer.schemas.bibus._3.BaseClass;
@@ -55,4 +56,15 @@ public interface ICognos8Service {
 	
 	//取得日志明细列表 
 	public JSONObject getLogDtlList(Map<String,Object> map,int offset ,int pagesize) throws Exception; 
+	
+	//取得定时任务
+	public TCmTimeTaskVO  getTimeTask(String id)throws Exception; 
+	
+	
+	//保存定时任务
+	public void  saveTimeTask(TCmTimeTaskVO  vo)throws Exception; 
+	
+	
+	//取得定时任务列表 
+	public JSONObject getTimeTaskList(Map<String,Object> map,int offset ,int pagesize) throws Exception; 
 }

@@ -102,6 +102,11 @@ $(function (){
                      text: '添加到已选择', 
                      icon:'add',
                      click:addReportsToSelected
+                   },
+                   {
+                	 text :"查看定时任务",
+                	 icon:"search",
+                	 click:viewTimeTask
                    }
                ]
             });
@@ -178,7 +183,12 @@ $(function (){
                     text: '删除已选择', 
                     icon:'delete',
                     click:deleteReportsFromSelected
-                  }
+                  },
+                  { 
+                      text: '新建定时任务', 
+                      icon:'add',
+                      click:createTimeTask
+                   }
               ]
            });
            
@@ -343,6 +353,16 @@ function viewLog(id){
 			}
 		}
 		return newRow;
+	}
+	//新建定时任务
+	function createTimeTask(){
+		 var tabid = new Date().getTime();
+		 navtab.addTabItem({text:"新建定时任务",url:"<%=contextPath%>/restful/cognos8/timetask/edit/?tabid="+tabid,height:"90%",tabid:tabid});
+	}
+	
+	//查看定时任务
+	function viewTimeTask(){
+		navtab.addTabItem({text:"定时任务列表",url:"<%=contextPath%>/views/timetask/timetask_list.jsp",height:"90%"});
 	}
 </script>
 </head>
