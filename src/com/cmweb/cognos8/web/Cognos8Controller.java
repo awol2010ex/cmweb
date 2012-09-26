@@ -257,5 +257,33 @@ public class Cognos8Controller {
 		}
 
 	}
+	// 日志明细列表
+	@RequestMapping(value = "/log/dtl/list")
+	public void getLogDtlList(HttpServletRequest request,
+			HttpServletResponse response, int page, int pagesize) {
 
+		String logid = request.getParameter("logid");// 日志ID
+		JSONObject result = new JSONObject().element("Total", 0).element(
+				"Rows", new JSONArray());
+		if (logid != null) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("logid", logid);
+
+			//分页查询结果
+			try {
+				result = cognos8Service.getLogDtlList(map, (page - 1) * pagesize,
+						pagesize);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				logger.error("", e);
+			}
+
+		}
+		try {
+			response.getWriter().print(result.toString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			logger.error("", e);
+		}
+	}
 }

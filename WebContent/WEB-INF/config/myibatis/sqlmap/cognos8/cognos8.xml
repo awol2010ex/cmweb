@@ -5,10 +5,45 @@
 <mapper namespace="com.cmweb.cognos8">
 <!--  取得发送日志列表 -->
 	<select id="getLogList" parameterType="map" resultType="map">
-	    select  * from T_CM_TIME_TASK_LOG where reportid =#{reportid}
+	    SELECT
+    LOG.ID,
+    LOG.CREATEDDATETIME ,
+    LOG.LOGRESULT ,
+    LOG.REPORTNAME,
+    LOG.SEARCHPATH ,
+    LOG.SENDER ,
+    LOG.REPORTID,
+    COUNT(LOG_DTL.ID) DTLCOUNT
+FROM
+    T_CM_TIME_TASK_LOG log
+LEFT JOIN
+    T_CM_TIME_TASK_LOG_DTL LOG_DTL
+ON
+    LOG_DTL.LOGID=LOG.ID
+where reportid =#{reportid}
+GROUP BY
+    LOG.ID ,
+    LOG.CREATEDDATETIME,
+    LOG.LOGRESULT,
+    LOG.REPORTNAME,
+    LOG.SEARCHPATH,
+    LOG.SENDER,
+    LOG.REPORTID
+	     
+	     
     </select>
     <!--  取得发送日志行数 -->
     <select id="getLogCount" parameterType="map" resultType="int">
 	    select  count(1) from T_CM_TIME_TASK_LOG where reportid =#{reportid}
+    </select>
+    
+    <!--  取得发送日志明细行数 -->
+    <select id="getLogDtlCount" parameterType="map" resultType="int">
+	    select  count(1) from T_CM_TIME_TASK_LOG_DTL where logid =#{logid}
+    </select>
+    
+    <!--  取得发送日志明细 -->
+    <select id="getLogDtlList" parameterType="map" resultType="map">
+	    select  * from T_CM_TIME_TASK_LOG_DTL where logid =#{logid} order by EMAIL
     </select>
 </mapper>

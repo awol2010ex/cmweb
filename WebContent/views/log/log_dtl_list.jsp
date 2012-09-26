@@ -36,40 +36,23 @@ var g=null;
 $(function (){
 	var g=$("#grid").ligerGrid({
         columns: [ 
-              { display: '搜索路径', name: 'SEARCHPATH', width: "20%",isAllowHide: true },
-              { display: '发送人', name: 'SENDER', width: "20%",isAllowHide: true },
-              { display: '报表名', name: 'REPORTNAME', width: "20%",isAllowHide: true },
-              { display: '发送时间', name: 'CREATEDDATETIME', width: "20%",isAllowHide: true,type:'date' },
-              { display: '发送人数', name: 'DTLCOUNT', width: "20%",isAllowHide: true,
-            	render :function(row){
-            		  
-            		  var html="";
-            	      html+="<a href='#' onclick=\"viewLogDtl('"+row.ID+"')\"> "+row.DTLCOUNT+" </a>";
-            		  
-            		  return html;
-            	}
-                
-              }
+              { display: 'EMAIL', name: 'EMAIL', width: "20%",isAllowHide: true ,align:'left'}
         ],
-        url: "<%=contextPath%>/restful/cognos8/log/list/?reportid=<%=request.getParameter("reportid") %>",
-        sortName: 'ID',
+        url: "<%=contextPath%>/restful/cognos8/log/dtl/list/?logid=<%=request.getParameter("logid") %>",
+        sortName: 'EMAIL',
         showTitle: false,
         dataAction:'server',
-        pageSize: 5,
+        pageSize:20,
         height:"100%",
         enabledEdit: true,
         dateFormat:'yyyy-MM-dd hh:mm:ss',
-        pageSizeOptions: [5, 10, 15]
+        pageSizeOptions: [20, 100, 200]
 
     });
 	       
 
 });
 
-//查看明细
-function viewLogDtl(logid){
-	parent.navtab.addTabItem({text:"查看日志明细",url:'<%=contextPath%>/views/log/log_dtl_list.jsp?logid='+logid,height:"90%"});
-}
 
 
 </script>

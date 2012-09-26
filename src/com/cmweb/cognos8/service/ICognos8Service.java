@@ -52,4 +52,7 @@ public interface ICognos8Service {
 	
 	//取得日志列表 
 	public JSONObject getLogList(Map<String,Object> map,int offset ,int pagesize) throws Exception; 
+	
+	//取得日志明细列表 
+	public JSONObject getLogDtlList(Map<String,Object> map,int offset ,int pagesize) throws Exception; 
 }

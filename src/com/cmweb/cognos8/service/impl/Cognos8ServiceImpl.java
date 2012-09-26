@@ -48,6 +48,7 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 	private ITCmTimeTaskLogDAO tCmTimeTaskLogDAO;// 发送邮件日志DAO
 	@Autowired
 	private ITCmTimeTaskLogDtlDAO tCmTimeTaskLogDtlDAO;// 发送邮件日志明细DAO
+
 	// 登陆cognos
 	@Override
 	public void quickLogon(CRNConnect connection, String namespace, String uid,
@@ -172,21 +173,33 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 		tCmTimeTaskLogDAO.save(vo);
 	}
 
-	//保存发送日志明细
+	// 保存发送日志明细
 	@Transactional
 	public void saveLogDtl(List<TCmTimeTaskLogDtlVO> list) throws Exception {
 		tCmTimeTaskLogDtlDAO.saveAll(list);
 	}
-	
-	
-	//取得日志列表 
-	public JSONObject getLogList(Map<String,Object> map,int offset ,int pagesize) throws Exception{
-		JSONObject result =new JSONObject();
-		
-		result.put("Total",tCmTimeTaskLogDAO.getLogCount(map));//总行数
-		result.put("Rows", JSONArray.fromObject(tCmTimeTaskLogDAO.getLogList(map, offset, pagesize)));//当前页查询结构
-		
-		
-		return result ;
+
+	// 取得日志列表
+	public JSONObject getLogList(Map<String, Object> map, int offset,
+			int pagesize) throws Exception {
+		JSONObject result = new JSONObject();
+
+		result.put("Total", tCmTimeTaskLogDAO.getLogCount(map));// 总行数
+		result.put("Rows", JSONArray.fromObject(tCmTimeTaskLogDAO.getLogList(
+				map, offset, pagesize)));// 当前页查询结构
+
+		return result;
+	}
+
+	// 取得日志明细列表
+	public JSONObject getLogDtlList(Map<String, Object> map, int offset,
+			int pagesize) throws Exception {
+		JSONObject result = new JSONObject();
+
+		result.put("Total", tCmTimeTaskLogDtlDAO.getLogDtlCount(map));// 总行数
+		result.put("Rows", JSONArray.fromObject(tCmTimeTaskLogDtlDAO
+				.getLogDtlList(map, offset, pagesize)));// 当前页查询结构
+
+		return result;
 	}
 }
