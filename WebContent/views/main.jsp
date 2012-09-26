@@ -94,6 +94,19 @@ $(function (){
             $("#navtab1").ligerTab({changeHeightOnResize:true,dragToMove:true,dblClickToClose:true});
             navtab = $("#navtab1").ligerGetTabManager();
            
+            
+            //工具条
+            $("#toptoolbar1").ligerToolBar({ 
+       		 items: [
+                   { 
+                     text: '添加到已选择', 
+                     icon:'add',
+                     click:addReportsToSelected
+                   }
+               ]
+            });
+            
+            
           //报表列表
            grid=$("#grid").ligerGrid({
         	    checkbox: true,
@@ -156,6 +169,22 @@ $(function (){
            
            
            
+           
+           
+         //工具条
+           $("#toptoolbar2").ligerToolBar({ 
+      		 items: [
+                  { 
+                    text: '删除已选择', 
+                    icon:'delete',
+                    click:deleteReportsFromSelected
+                  }
+              ]
+           });
+           
+           
+           
+           
          //已选报表列表
            selected_grid=$("#selected_grid").ligerGrid({
         	    rownumbers:true,
@@ -164,7 +193,7 @@ $(function (){
                 columns: [
                       {
                     	  
-                    	  display: '名称', name: 'name', isAllowHide: true ,align:"left" ,
+                    	  display: '名称', name: 'name', isAllowHide: true ,align:"left" ,width:"100%",
                     	  render: function (row)
                           {
                               var html = "<img src='"+row.icon+"' style='width:12px;height:12px;' />&nbsp;"+row.name;
@@ -270,6 +299,51 @@ function sendMail(id){
 function viewLog(id){
 	 navtab.addTabItem({text:"查看日志",url:'<%=contextPath%>/views/log/log_list.jsp?reportid='+id,height:"90%"});
 }
+//添加选择的报表
+
+	function addReportsToSelected() {
+		var rows = grid.getCheckedRows();//已选行
+		//加到已选择表
+
+		for ( var i = 0; i < rows.length; i++) {
+			var row =rows[i];
+			if (row.className == 'com.cognos.developer.schemas.bibus._3.ReportView' //报表视图
+					|| row.className == 'com.cognos.developer.schemas.bibus._3.Report'//报表
+					|| row.className == 'com.cognos.developer.schemas.bibus._3.Shortcut'//报表链接
+			) {
+				selected_grid.addRow(getCleanRow(row));
+			}
+		}
+
+	}
+	
+	
+	//删除已选择报表
+	function deleteReportsFromSelected(){
+		selected_grid.deleteSelectedRow();
+		
+	}
+	
+	String.prototype.startWith=function(s){
+		  if(s==null||s==""||this.length==0||s.length>this.length)
+		   return false;
+		  if(this.substr(0,s.length)==s)
+		     return true;
+		  else
+		     return false;
+		  return true;
+    }
+	
+	//取得清洁的ROW
+	function getCleanRow(row){
+		var newRow ={};
+		for(var key in row){
+			if(!key.startWith('__')){
+				newRow[key]=row[key];
+			}
+		}
+		return newRow;
+	}
 </script>
 </head>
 <body >
@@ -286,14 +360,33 @@ function viewLog(id){
 		   <div id="navtab1" style=" border:1px solid #A3C0E8; height:100%;">
 		     <div  title="报表列表">
 		     
-                <div id="grid"></div>
+		       <table width="100%">
+		        <tr>
+		           <td>
+		              <div id="toptoolbar1"></div>
+		           </td>
+		        </tr>
+		        <tr><td>
+                   <div id="grid"></div>
+                </td></tr>
+               </table>
 			 </div>
            </div>
 		</div>
 		<div position="top"><%=cognos8_str%></div>
 		
 		<div position="right" title="已选报表列表">
-		     <div id="selected_grid"  ></div>
+		     
+		     <table width="100%">
+		        <tr>
+		           <td>
+		              <div id="toptoolbar2"></div>
+		           </td>
+		        </tr>
+		        <tr><td>
+                   <div id="selected_grid"  ></div>
+                </td></tr>
+               </table>
 		</div>
 	</div>
 
