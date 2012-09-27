@@ -33,7 +33,7 @@
    <appender name="FILE" class="org.apache.log4j.RollingFileAppender">
      <param name="File" value="../logs/cmweb.log"/>
      <param name="Append" value="true"/>
-     <param name="MaxFileSize" value="500KB"/>
+     <param name="MaxFileSize" value="4128KB"/>
      <param name="MaxBackupIndex" value="10"/>
      <param name="Threshold" value="DEBUG"/>
 
@@ -42,11 +42,12 @@
      </layout>
    </appender>
    <!-- limit logging for spring -->
+   <!--  
    <category name="org.springframework">
      <priority value="DEBUG"/>
      <appender-ref ref="FILE" />  
    </category>
-
+-->
     <category name="com.cmweb">
      <priority value="DEBUG"/>
      <appender-ref ref="FILE" />  

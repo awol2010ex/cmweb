@@ -60,4 +60,13 @@ GROUP BY
     <select id="getTimeTaskList" parameterType="map" resultType="map">
 	    select  * from T_CM_TIME_TASK order by createddatetime desc
     </select>
+    
+    
+    <!--  取得定时任务列表 -->
+    <select id="getAllTimeTaskList" parameterType="map" resultType="com.cmweb.cognos8.vo.TCmTimeTaskVO">
+	    select  * from T_CM_TIME_TASK  where 1=1
+	    <if test="ID!=null and ID!=''">    
+         AND ID =#{ID}
+     </if>
+    </select>
 </mapper>

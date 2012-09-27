@@ -194,6 +194,11 @@ public class Cognos8Dwr {
 			
 			
 			cognos8Service.saveTimeTask(bean);//保存到数据库
+			
+			
+			//重启定时任务
+			cognos8Service.shutdown(bean.getId());
+			cognos8Service.startTask(bean.getId(), bean.getCron());
 		} catch (Exception e) {
 			logger.error("", e);
 			return false;

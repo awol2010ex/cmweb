@@ -60,6 +60,8 @@ public interface ICognos8Service {
 	//取得定时任务
 	public TCmTimeTaskVO  getTimeTask(String id)throws Exception; 
 	
+	//取得所有定时任务
+	public List<TCmTimeTaskVO>  getAllTimeTask()throws Exception; 
 	
 	//保存定时任务
 	public void  saveTimeTask(TCmTimeTaskVO  vo)throws Exception; 
@@ -67,4 +69,7 @@ public interface ICognos8Service {
 	
 	//取得定时任务列表 
 	public JSONObject getTimeTaskList(Map<String,Object> map,int offset ,int pagesize) throws Exception; 
+	
+	//启动定时任务
+	public void initTimeTasks() ;
 }

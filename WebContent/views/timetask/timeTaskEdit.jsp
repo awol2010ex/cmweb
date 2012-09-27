@@ -121,7 +121,7 @@ $(function() {
 
 		<td align=""left"" class="l-table-edit-td">任务名:</td>
 
-		<td align="left" class="l-table-edit-td" width="90%" colspan="2"><input
+		<td align="left" class="l-table-edit-td" colspan="2"><input
 			name="taskname" type="text" id="taskname" ltype="text" field_name="taskname"
 			style="width: 400px" value="${bean.taskname}"/></td>
 
@@ -132,7 +132,7 @@ $(function() {
 
 		<td align="left" class="l-table-edit-td">CRON表达式:</td>
 
-		<td align="left" class="l-table-edit-td" width="90%"><input
+		<td align="left" class="l-table-edit-td" ><input
 			name="cron" type="text" id="cron" ltype="text" field_name="cron"
 			style="width: 400px" value="${bean.cron}"  readOnly="true"/></td>
 

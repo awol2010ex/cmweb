@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -142,6 +144,9 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 	// 启动定时任务
 	public ITask startTask(String taskCode, String express) throws Exception {
 		// TODO Auto-generated method stub
+		
+		
+		
 		ITask task = null;
 
 		TCmTimeTaskVO svo = null;
@@ -152,7 +157,7 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 		}
 		if (svo != null) {
 			// 启动任务
-			task = getInstance(taskCode);
+			task =new TCmTimeTaskExecutor(svo);//取得定时任务实例
 			task.startTask(svo.getCron());
 			addTask(taskCode, task);
 		}
@@ -160,12 +165,6 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 		return null;
 	}
 
-	// 取得一个定时任务实例
-	public ITask getInstance(String taskCode) throws Exception {
-
-		ITask task = new TCmTimeTaskExecutor(taskCode);
-		return task;
-	}
 
 	// 保存发送日志
 	@Transactional
@@ -202,27 +201,73 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 
 		return result;
 	}
-	
-	//取得定时任务
-	public TCmTimeTaskVO  getTimeTask(String id)throws Exception{
+
+	// 取得定时任务
+	public TCmTimeTaskVO getTimeTask(String id) throws Exception {
 		return tCmTimeTaskDAO.getTask(id);
+
+	}
+
+	// 保存定时任务
+	@Transactional
+	public void saveTimeTask(TCmTimeTaskVO vo) throws Exception {
+		tCmTimeTaskDAO.save(vo);
+		
 		
 	}
-	
-	//保存定时任务
-	@Transactional
-	public void  saveTimeTask(TCmTimeTaskVO  vo)throws Exception{
-		tCmTimeTaskDAO.save(vo);
-	}
-	
-	//取得定时任务列表 
-	public JSONObject getTimeTaskList(Map<String,Object> map,int offset ,int pagesize) throws Exception{
+
+	// 取得定时任务列表
+	public JSONObject getTimeTaskList(Map<String, Object> map, int offset,
+			int pagesize) throws Exception {
 		JSONObject result = new JSONObject();
 
 		result.put("Total", tCmTimeTaskDAO.getTimeTaskCount(map));// 总行数
-		result.put("Rows", JSONArray.fromObject(tCmTimeTaskDAO
-				.getTimeTaskList(map, offset, pagesize)));// 当前页查询结构
+		result.put("Rows", JSONArray.fromObject(tCmTimeTaskDAO.getTimeTaskList(
+				map, offset, pagesize)));// 当前页查询结构
 
 		return result;
+	}
+	
+	//取得所有定时任务
+	@Transactional
+	public List<TCmTimeTaskVO>  getAllTimeTask()throws Exception{
+		return tCmTimeTaskDAO.getAll();
+	}
+	
+	//启动定时任务
+	@PostConstruct 
+	public void initTimeTasks() {
+		List<TCmTimeTaskVO> list = null;// 定时任务列表
+		try {
+			list = this.getAllTimeTask();
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			logger.error("", e1);
+		}
+
+		if (list != null && list.size() > 0) {
+
+			for (int i = 0, s = list.size(); i < s; i++) {
+				TCmTimeTaskVO vo = (TCmTimeTaskVO) list.get(i);
+				
+				//防止重复加载
+				Object obj = tasks.get(vo.getId());
+
+				if (obj != null) {
+					continue;
+				}
+				
+				
+				String taskName = vo.getTaskname();// 任务名称
+				logger.info("开始启动定时任务--" + taskName);
+				try {
+					this.startTask(vo.getId(), vo.getCron());
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					logger.error("", e);
+				}
+				logger.info("结束启动定时任务--" + taskName);
+			}
+		}
 	}
 }

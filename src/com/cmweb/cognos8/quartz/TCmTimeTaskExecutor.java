@@ -7,13 +7,15 @@ import org.quartz.JobDetail;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 
+import com.cmweb.cognos8.vo.TCmTimeTaskVO;
+
 //cognos8发邮件定时任务
 public class TCmTimeTaskExecutor extends BaseTask {
 
-	private String taskScheduleId;
+	private TCmTimeTaskVO taskVO;
 
-	public TCmTimeTaskExecutor(String taskScheduleId) {
-		this.taskScheduleId = taskScheduleId;
+	public TCmTimeTaskExecutor(TCmTimeTaskVO taskVO) {
+		this.taskVO = taskVO;
 	}
 
 	//覆盖启动任务方法,express 定时任务 cron表达式
@@ -30,15 +32,15 @@ public class TCmTimeTaskExecutor extends BaseTask {
 
 		this.scheduler = schedulerFactory.getScheduler();
 
-		JobDetail jobDetail = new JobDetail(taskScheduleId,
+		JobDetail jobDetail = new JobDetail(taskVO.getId(),
 				"cognos8.4 time email", TCmTimeTaskJob.class);
 		JobDataMap map = new JobDataMap();
 		// 注入定时任务ID
-		map.put("taskScheduleId", taskScheduleId);
+		map.put("taskVO", taskVO);
 		jobDetail.setJobDataMap(map);
 
-		CronTrigger cronTrigger = new CronTrigger(taskScheduleId,
-				"bizImportTaskGroup");
+		CronTrigger cronTrigger = new CronTrigger(taskVO.getId(),
+				"cognos8.4 time email cron");
 
 		CronExpression cexp = new CronExpression(express);
 
