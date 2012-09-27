@@ -37,6 +37,33 @@ body {
 	
 
 <script type='text/javascript'>
+
+
+var grid=null;//报表列表
+
+var grid_manager =null; //报表列表管理器
+//字符串startsWith方法
+String.prototype.startWith = function(s) {
+	if (s == null || s == "" || this.length == 0 || s.length > this.length)
+		return false;
+	if (this.substr(0, s.length) == s)
+		return true;
+	else
+		return false;
+	return true;
+}
+
+//取得清洁的ROW,去掉__开头的key
+function getCleanRow(row) {
+	var newRow = {};
+	for ( var key in row) {
+		if (!key.startWith('__')) {
+			newRow[key] = row[key];
+		}
+	}
+	return newRow;
+}
+
 $(function() {
 	$("body").ligerLayout();
 	
@@ -69,9 +96,10 @@ $(function() {
 		
 		    var url='<%=request.getContextPath() %>/views/timetask/cronDef.jsp';
 		    
+		    
+		    //编辑cron表达式
 		    if($("#cron").val() && $.trim($("#cron").val())!=''){
 		    	url=url+"?taskConf="+$.trim($("#cron").val());
-		    	
 		    }
 		    
 			$.ligerDialog.open({
@@ -84,7 +112,7 @@ $(function() {
 					onclick : function(item, dialog){
 						
 						
-						if (dialog.frame.DoSave()) {
+						if (dialog.frame.DoSave()) {//转化为字符串
 							var taskDef = dialog.frame.$("taskDef").value ;
 							$("#cron").val(taskDef);
 							dialog.close();
@@ -97,8 +125,53 @@ $(function() {
 			});
 
 		});
+	
+	
+	//报表列表
+    grid=$("#grid").ligerGrid({
 
-	});
+         columns: [
+               {
+             	  
+             	  display: '名称', name: 'name', isAllowHide: true ,align:"left" ,
+             	  render: function (row)
+                   {
+                       var html = "<img src='"+row.icon+"' style='width:12px;height:12px;' />&nbsp;"+row.name;
+                       return html;
+                   }
+
+             	  
+               }
+         ],
+         sortName: 'id',
+         showTitle: false,
+         dataAction:'local',
+         pageSize: 10,
+         height:"90%",
+         enabledEdit: false,
+         pageSizeOptions: [10,50,100],
+         rownumbers:true,
+
+         colDraggable:true
+
+     });
+
+	//报表列表管理器
+    grid_manager =$("#grid").ligerGetGridManager();
+    
+    
+    //已选报表数据
+    var  selected_data= top.selected_grid_manager.getData();
+    for ( var i = 0; i < selected_data.length; i++) {
+		var data = selected_data[i];
+		
+		grid.addRow(getCleanRow(data));
+	}
+
+  
+
+	
+});
 </script>
 </head>
 <body style="width: 95%; height: 95%;">
@@ -145,6 +218,14 @@ $(function() {
         </td>
 		<td align="left" width="100%"></td>
 
+	</tr>
+	
+	<tr>
+	
+	    <td colspan="4" style="padding:10px">
+	      <!-- 已选报表列表 -->
+	       <div id="grid"></div>
+	    </td>
 	</tr>
 	
 	

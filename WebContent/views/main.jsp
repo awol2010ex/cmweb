@@ -345,6 +345,7 @@ function viewLog(id){
 
 	}
 
+	//字符串startsWith方法
 	String.prototype.startWith = function(s) {
 		if (s == null || s == "" || this.length == 0 || s.length > this.length)
 			return false;
@@ -355,7 +356,7 @@ function viewLog(id){
 		return true;
 	}
 
-	//取得清洁的ROW
+	//取得清洁的ROW,去掉__开头的key
 	function getCleanRow(row) {
 		var newRow = {};
 		for ( var key in row) {
