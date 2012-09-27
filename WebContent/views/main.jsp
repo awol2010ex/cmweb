@@ -311,53 +311,67 @@ function viewLog(id){
 }
 //添加选择的报表
 
+	
 	function addReportsToSelected() {
 		var rows = grid.getCheckedRows();//已选行
 		//加到已选择表
 
 		for ( var i = 0; i < rows.length; i++) {
-			var row =rows[i];
+			var row = rows[i];
 			if (row.className == 'com.cognos.developer.schemas.bibus._3.ReportView' //报表视图
 					|| row.className == 'com.cognos.developer.schemas.bibus._3.Report'//报表
 					|| row.className == 'com.cognos.developer.schemas.bibus._3.Shortcut'//报表链接
 			) {
-				selected_grid.addRow(getCleanRow(row));
+				if (!isSelected(row)) {
+					selected_grid.addRow(getCleanRow(row));
+				}
 			}
 		}
 
 	}
-	
-	
-	//删除已选择报表
-	function deleteReportsFromSelected(){
-		selected_grid.deleteSelectedRow();
-		
+	//该报表是否已选择
+	function isSelected(row) {
+		var selected_data = selected_grid_manager.getData();//已选报表
+		for ( var i = 0, s = selected_data.length; i < s; i++) {
+			if (selected_data[i].id == row.id) {
+				return true;
+			}
+		}
+		return false;
 	}
-	
-	String.prototype.startWith=function(s){
-		  if(s==null||s==""||this.length==0||s.length>this.length)
-		   return false;
-		  if(this.substr(0,s.length)==s)
-		     return true;
-		  else
-		     return false;
-		  return true;
-    }
-	
+	//删除已选择报表
+	function deleteReportsFromSelected() {
+		selected_grid.deleteSelectedRow();
+
+	}
+
+	String.prototype.startWith = function(s) {
+		if (s == null || s == "" || this.length == 0 || s.length > this.length)
+			return false;
+		if (this.substr(0, s.length) == s)
+			return true;
+		else
+			return false;
+		return true;
+	}
+
 	//取得清洁的ROW
-	function getCleanRow(row){
-		var newRow ={};
-		for(var key in row){
-			if(!key.startWith('__')){
-				newRow[key]=row[key];
+	function getCleanRow(row) {
+		var newRow = {};
+		for ( var key in row) {
+			if (!key.startWith('__')) {
+				newRow[key] = row[key];
 			}
 		}
 		return newRow;
 	}
 	//新建定时任务
-	function createTimeTask(){
-		 var tabid = new Date().getTime();
-		 navtab.addTabItem({text:"新建定时任务",url:"<%=contextPath%>/restful/cognos8/timetask/edit/?tabid="+tabid,height:"90%",tabid:tabid});
+	function createTimeTask() {
+		var tabid = new Date().getTime();
+		navtab.addTabItem({
+			text : "新建定时任务",
+			url : "<%=contextPath%>/restful/cognos8/timetask/edit/?tabid="+tabid,height:"90%",tabid:tabid
+		});
 	}
 	
 	//查看定时任务
