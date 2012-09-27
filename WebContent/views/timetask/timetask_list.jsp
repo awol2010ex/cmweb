@@ -8,6 +8,11 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title></title>
+
+<script type='text/javascript'
+	src='<%=request.getContextPath() %>/dwr/interface/Cognos8Dwr.js'></script>
+<script type='text/javascript'
+	src='<%=request.getContextPath() %>/dwr/engine.js'></script>
 <jsp:include  page="/css.jsp"  flush="true" />
 <style type="text/css">
 body {
@@ -45,6 +50,7 @@ $(function (){
           		  
           		  var html="";
           	      html+="<a href='#' onclick=\"editTimeTask('"+row.ID+"')\">编辑</a>";
+          	      html+="&nbsp;<a href='#' onclick=\"removeTimeTask('"+row.ID+"')\">删除</a>";
           		  
           		  return html;
           	    }
@@ -69,6 +75,24 @@ $(function (){
 function editTimeTask(id){
 	var tabid = new Date().getTime();
 	parent.navtab.addTabItem({text:"编辑定时任务",url:'<%=contextPath%>/restful/cognos8/timetask/edit/?tabid='+tabid+'&id='+id,height:"90%",tabid:tabid});
+}
+//删除
+function removeTimeTask(id){
+	var b =window.confirm("确定删除?");
+	if(b){
+		
+		Cognos8Dwr.removeTimeTask(id, 
+		    function(result){
+			 if(result){
+                alert("删除成功");
+                $("#grid").ligerGetGridManager().loadData();
+             }else{
+                alert("删除失败");
+             }
+		    } 		
+		
+		);
+	}
 }
 
 

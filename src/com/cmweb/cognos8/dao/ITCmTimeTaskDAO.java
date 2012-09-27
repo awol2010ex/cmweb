@@ -21,4 +21,7 @@ public interface ITCmTimeTaskDAO {
 	
 	//取得定时任务行数
 	public Integer getTimeTaskCount(Map<String,Object> map) throws Exception;
+	
+	//删除定时任务
+	public void delete(String taskCode) throws Exception;
 }

@@ -270,4 +270,10 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 			}
 		}
 	}
+	
+	//删除定时任务
+	@Transactional
+	public void removeTimeTask(String taskCode) throws Exception{
+		tCmTimeTaskDAO.delete(taskCode);
+	}
 }

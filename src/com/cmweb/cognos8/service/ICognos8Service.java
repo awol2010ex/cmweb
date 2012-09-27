@@ -72,4 +72,7 @@ public interface ICognos8Service {
 	
 	//启动定时任务
 	public void initTimeTasks() ;
+	
+	//删除定时任务
+	public void removeTimeTask(String taskCode) throws Exception;
 }

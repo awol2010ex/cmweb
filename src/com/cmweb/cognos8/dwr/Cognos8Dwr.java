@@ -163,7 +163,7 @@ public class Cognos8Dwr {
 	}
 	
 	
-	// 保存数据源
+	// 保存定时任务
 	public boolean saveTimeTask(TCmTimeTaskVO vo) {
 		try {
 			TCmTimeTaskVO bean =new TCmTimeTaskVO();
@@ -199,6 +199,23 @@ public class Cognos8Dwr {
 			//重启定时任务
 			cognos8Service.shutdown(bean.getId());
 			cognos8Service.startTask(bean.getId(), bean.getCron());
+		} catch (Exception e) {
+			logger.error("", e);
+			return false;
+		}
+		return true;
+	}
+	
+	
+	// 删除定时任务
+	public boolean removeTimeTask(String taskCode) {
+		try {
+			
+			cognos8Service.removeTimeTask(taskCode);//删除定时任务
+			
+			
+			//关闭定时任务
+			cognos8Service.shutdown(taskCode);
 		} catch (Exception e) {
 			logger.error("", e);
 			return false;
