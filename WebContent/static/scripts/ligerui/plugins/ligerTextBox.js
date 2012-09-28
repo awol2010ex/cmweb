@@ -1,7 +1,9 @@
 ﻿/**
-* jQuery ligerUI 1.1.6
+* jQuery ligerUI 1.1.9
 * 
-* Author leoxie [ gd_star@163.com ] 
+* http://ligerui.com
+*  
+* Author daomi 2012 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -20,7 +22,10 @@
         onChangeValue: null,
         width: null,
         disabled: false,
-        value: null     //初始化值 
+        value: null,     //初始化值 
+        nullText: null,   //不能为空时的提示
+        digits: false,     //是否限定为数字输入框
+        number: false    //是否限定为浮点数格式输入框
     };
 
 
@@ -46,6 +51,10 @@
             {
                 p.width = $(g.element).width();
             }
+            if ($(this.element).attr("readonly"))
+            {
+                p.disabled = true;
+            }
         },
         _render: function ()
         {
@@ -57,27 +66,62 @@
             if (!g.inputText.hasClass("l-text-field"))
                 g.inputText.addClass("l-text-field");
             this._setEvent();
-
             g.set(p);
+            g.checkValue();
         },
         _getValue: function ()
         {
             return this.inputText.val();
         },
+        _setNullText: function ()
+        {
+            this.checkNotNull();
+        },
+        checkValue: function ()
+        {
+            var g = this, p = this.options;
+            var v = g.inputText.val();
+            if (p.number && !/^-?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$/.test(v) || p.digits && !/^\d+$/.test(v))
+            {
+                g.inputText.val(g.value || 0);
+                return;
+            } 
+            g.value = v;
+        },
+        checkNotNull: function ()
+        {
+            var g = this, p = this.options;
+            if (p.nullText && !p.disabled)
+            {
+                if (!g.inputText.val())
+                {
+                    g.inputText.addClass("l-text-field-null").val(p.nullText);
+                }
+            }
+        },
         _setEvent: function ()
         {
             var g = this, p = this.options;
-            g.inputText.bind('blur.ligerTextBox', function ()
+            g.inputText.bind('blur.textBox', function ()
             {
                 g.trigger('blur');
+                g.checkNotNull();
+                g.checkValue();
                 g.wrapper.removeClass("l-text-focus");
-            }).bind('focus.ligerTextBox', function ()
+            }).bind('focus.textBox', function ()
             {
                 g.trigger('focus');
+                if (p.nullText)
+                {
+                    if ($(this).hasClass("l-text-field-null"))
+                    {
+                        $(this).removeClass("l-text-field-null").val("");
+                    }
+                }
                 g.wrapper.addClass("l-text-focus");
             })
             .change(function ()
-            {
+            { 
                 g.trigger('changeValue', [this.value]);
             });
             g.wrapper.hover(function ()
@@ -165,9 +209,25 @@
             var g = this, p = this.options;
             if (!g.labelwrapper) return;
             g.labelwrapper.find(".l-text-label").css('text-align', value);
+        },
+        updateStyle: function ()
+        {
+            var g = this, p = this.options;
+            if (g.inputText.attr('disabled') || g.inputText.attr('readonly'))
+            {
+                g.wrapper.addClass("l-text-disabled");
+                g.options.disabled = true;
+            }
+            else
+            {
+                g.wrapper.removeClass("l-text-disabled");
+                g.options.disabled = false;
+            }
+            if (g.inputText.hasClass("l-text-field-null") && g.inputText.val() != p.nullText)
+            {
+                g.inputText.removeClass("l-text-field-null");
+            }
+            g.checkValue();
         }
     });
-
-
-
 })(jQuery);

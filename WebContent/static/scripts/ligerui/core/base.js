@@ -1,7 +1,9 @@
 ﻿/**
-* jQuery ligerUI 1.1.6
+* jQuery ligerUI 1.1.9
 * 
-* Author leoxie [ gd_star@163.com ] 
+* http://ligerui.com
+*  
+* Author daomi 2012 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -31,8 +33,8 @@
     };
 
     // 核心对象
-    $.ligerui = {
-        version: 'V1.1.6',
+    window.liger = $.ligerui = {
+        version: 'V1.1.9',
         managerCount: 0,
         //组件管理器池
         managers: {},
@@ -62,7 +64,17 @@
                 throw new Error(this.error.managerIsExist);
             this.managers[manager.id] = manager;
         },
-
+        remove: function (arg)
+        {
+            if (typeof arg == "string" || typeof arg == "number")
+            {
+                delete $.ligerui.managers[arg];
+            }
+            else if (typeof arg == "object" && arg instanceof $.ligerui.core.Component)
+            {
+                delete $.ligerui.managers[arg.id];
+            }
+        },
         //获取ligerui对象
         //1,传入ligerui ID
         //2,传入Dom Object Array(jQuery)
@@ -151,7 +163,13 @@
             if (/Manager$/.test(plugin)) return $.ligerui.get(this, ext.idAttrName);
             this.each(function ()
             {
-                if (this[ext.idAttrName] || $(this).attr(ext.idAttrName)) return;  //已经执行过 
+                if (this[ext.idAttrName] || $(this).attr(ext.idAttrName))
+                {
+                    var manager = $.ligerui.get(this[ext.idAttrName] || $(this).attr(ext.idAttrName));
+                    if (manager && args.length > 0) manager.set(args[0]);
+                    //已经执行过 
+                    return;
+                }
                 if (args.length >= 1 && typeof args[0] == 'string') return;
                 //只要第一个参数不是string类型,都执行组件的实例化工作
                 var options = args.length > 0 ? args[0] : null;
@@ -302,6 +320,7 @@
                 return;
             }
             this.trigger('propertychange', arg, value);
+            if (!this.options) this.options = {};
             this.options[name] = value;
             var pn = '_set' + name.substr(0, 1).toUpperCase() + name.substr(1);
             if (this[pn])
@@ -396,7 +415,10 @@
                 }
             }
         },
-        destroy: function () { }
+        destroy: function ()
+        {
+            $.ligerui.remove(this);
+        }
     });
 
 
@@ -493,6 +515,7 @@
         {
             if (this.element) $(this.element).remove();
             this.options = null;
+            $.ligerui.remove(this);
         }
     });
 
@@ -507,6 +530,10 @@
         __getType: function ()
         {
             return '$.ligerui.controls.Input';
+        },
+        attr: function ()
+        {
+            return ['nullText'];
         },
         setValue: function (value)
         {
@@ -536,7 +563,7 @@
         top: false,
 
         //遮罩
-        mask: function ()
+        mask: function (win)
         {
             function setHeight()
             {
@@ -556,8 +583,21 @@
         },
 
         //取消遮罩
-        unmask: function ()
+        unmask: function (win)
         {
+            var jwins = $("body > .l-dialog:visible,body > .l-window:visible");
+            for (var i = 0, l = jwins.length; i < l; i++)
+            {
+                var winid = jwins.eq(i).attr("ligeruiid");
+                if (win && win.id == winid) continue;
+                //获取ligerui对象
+                var winmanager = $.ligerui.get(winid);
+                if (!winmanager) continue;
+                //是否模态窗口
+                var modal = winmanager.get('modal');
+                //如果存在其他模态窗口，那么不会取消遮罩
+                if (modal) return;
+            }
             if (this.windowMask)
                 this.windowMask.hide();
             this.masking = false;
@@ -703,12 +743,12 @@
         mask: function ()
         {
             if (this.options.modal)
-                $.ligerui.win.mask();
+                $.ligerui.win.mask(this);
         },
         unmask: function ()
         {
             if (this.options.modal)
-                $.ligerui.win.unmask();
+                $.ligerui.win.unmask(this);
         },
         min: function ()
         {
@@ -729,4 +769,81 @@
     $.ligerui.resizable = {
         reszing: false
     };
+
+
+    $.ligerui.toJSON = typeof JSON === 'object' && JSON.stringify ? JSON.stringify : function (o)
+    {
+        var f = function (n)
+        {
+            return n < 10 ? '0' + n : n;
+        },
+		escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+		quote = function (value)
+		{
+		    escapable.lastIndex = 0;
+		    return escapable.test(value) ?
+				'"' + value.replace(escapable, function (a)
+				{
+				    var c = meta[a];
+				    return typeof c === 'string' ? c :
+						'\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+				}) + '"' :
+				'"' + value + '"';
+		};
+        if (o === null) return 'null';
+        var type = typeof o;
+        if (type === 'undefined') return undefined;
+        if (type === 'string') return quote(o);
+        if (type === 'number' || type === 'boolean') return '' + o;
+        if (type === 'object')
+        {
+            if (typeof o.toJSON === 'function')
+            {
+                return $.ligerui.toJSON(o.toJSON());
+            }
+            if (o.constructor === Date)
+            {
+                return isFinite(this.valueOf()) ?
+                   this.getUTCFullYear() + '-' +
+                 f(this.getUTCMonth() + 1) + '-' +
+                 f(this.getUTCDate()) + 'T' +
+                 f(this.getUTCHours()) + ':' +
+                 f(this.getUTCMinutes()) + ':' +
+                 f(this.getUTCSeconds()) + 'Z' : null;
+            }
+            var pairs = [];
+            if (o.constructor === Array)
+            {
+                for (var i = 0, l = o.length; i < l; i++)
+                {
+                    pairs.push($.ligerui.toJSON(o[i]) || 'null');
+                }
+                return '[' + pairs.join(',') + ']';
+            }
+            var name, val;
+            for (var k in o)
+            {
+                type = typeof k;
+                if (type === 'number')
+                {
+                    name = '"' + k + '"';
+                } else if (type === 'string')
+                {
+                    name = quote(k);
+                } else
+                {
+                    continue;
+                }
+                type = typeof o[k];
+                if (type === 'function' || type === 'undefined')
+                {
+                    continue;
+                }
+                val = $.ligerui.toJSON(o[k]);
+                pairs.push(name + ':' + val);
+            }
+            return '{' + pairs.join(',') + '}';
+        }
+    };
+
 })(jQuery);

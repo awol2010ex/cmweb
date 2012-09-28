@@ -1,7 +1,9 @@
 ﻿/**
-* jQuery ligerUI 1.1.6
+* jQuery ligerUI 1.1.9
 * 
-* Author leoxie [ gd_star@163.com ] 
+* http://ligerui.com
+*  
+* Author daomi 2012 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -46,14 +48,14 @@
             {
                 if (g.input.attr('disabled')) { return false; }
                 if (p.disabled) return false;
-                if (g.trigger('beforeClick', [g.element]) == false) return false;
+                if (g.trigger('beforeClick', [g.element]) == false) return false; 
                 if ($(this).hasClass("l-checkbox-checked"))
                 {
-                    g.setValue(false);
+                    g._setValue(false);
                 }
                 else
                 {
-                    g.setValue(true);
+                    g._setValue(true);
                 }
                 g.input.trigger("change");
             });
@@ -85,18 +87,18 @@
                 g.input[0].checked = true;
                 g.link.addClass('l-checkbox-checked');
             }
-        }, 
+        },
         _setDisabled: function (value)
-        { 
+        {
             if (value)
             {
                 this.input.attr('disabled', true);
-                this.wrapper.addClass("l-disabled"); 
+                this.wrapper.addClass("l-disabled");
             }
             else
             {
                 this.input.attr('disabled', false);
-                this.wrapper.removeClass("l-disabled"); 
+                this.wrapper.removeClass("l-disabled");
             }
         },
         _getValue: function ()

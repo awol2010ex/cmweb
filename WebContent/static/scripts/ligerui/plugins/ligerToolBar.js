@@ -1,9 +1,11 @@
 ﻿/**
-* jQuery ligerUI 1.1.6
+* jQuery ligerUI 1.1.9
 * 
-* Author leoxie [ gd_star@163.com ] 
+* http://ligerui.com
+*  
+* Author daomi 2012 [ gd_star@163.com ] 
 * 
-*/ 
+*/
 (function ($)
 {
 
@@ -64,7 +66,12 @@
             var ditem = $('<div class="l-toolbar-item l-panel-btn"><span></span><div class="l-panel-btn-l"></div><div class="l-panel-btn-r"></div></div>');
             g.toolBar.append(ditem);
             item.id && ditem.attr("toolbarid", item.id);
-            if (item.icon)
+            if (item.img)
+            {
+                ditem.append("<img src='" + item.img + "' />");
+                ditem.addClass("l-toolbar-item-hasicon");
+            }
+            else if (item.icon)
             {
                 ditem.append("<div class='l-icon l-icon-" + item.icon + "'></div>");
                 ditem.addClass("l-toolbar-item-hasicon");

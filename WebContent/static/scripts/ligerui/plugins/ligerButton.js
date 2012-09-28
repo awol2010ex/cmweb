@@ -1,7 +1,9 @@
 ﻿/**
-* jQuery ligerUI 1.1.6
+* jQuery ligerUI 1.1.9
 * 
-* Author leoxie [ gd_star@163.com ] 
+* http://ligerui.com
+*  
+* Author daomi 2012 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -90,6 +92,6 @@
     });
 
 
- 
+
 
 })(jQuery);

@@ -1,7 +1,9 @@
 ﻿/**
-* jQuery ligerUI 1.1.6
+* jQuery ligerUI 1.1.9
 * 
-* Author leoxie [ gd_star@163.com ] 
+* http://ligerui.com
+*  
+* Author daomi 2012 [ gd_star@163.com ] 
 * 
 */
 
@@ -21,12 +23,40 @@
         {
             var p = $.extend({}, $.ligerDefaults.ElementTip, options || {});
             p.target = p.target || this;
-            if (p.target.ligeruitipid) return;
-            p.x = $(this).offset().left + $(this).width() + (p.distanceX || 0);
-            p.y = $(this).offset().top + (p.distanceY || 0);
-            p.x = p.x || 0;
-            p.y = p.y || 0;
-            $.ligerTip(p);
+            //如果是自动模式：鼠标经过时显示，移开时关闭
+            if (p.auto || options == undefined)
+            {
+                if (!p.content)
+                {
+                    p.content = this.title;
+                    if (p.removeTitle)
+                        $(this).removeAttr("title");
+                }
+                p.content = p.content || this.title;
+                $(this).bind('mouseover.tip', function ()
+                {
+                    p.x = $(this).offset().left + $(this).width() + (p.distanceX || 0);
+                    p.y = $(this).offset().top + (p.distanceY || 0);
+                    $.ligerTip(p);
+                }).bind('mouseout.tip', function ()
+                {
+
+                    var tipmanager = $.ligerui.managers[this.ligeruitipid];
+                    if (tipmanager)
+                    {
+                        tipmanager.remove();
+                    }
+                });
+            }
+            else
+            {
+                if (p.target.ligeruitipid) return;
+                p.x = $(this).offset().left + $(this).width() + (p.distanceX || 0);
+                p.y = $(this).offset().top + (p.distanceY || 0);
+                p.x = p.x || 0;
+                p.y = p.y || 0;
+                $.ligerTip(p);
+            }
         });
         return $.ligerui.get(this, 'ligeruitipid');
     };
@@ -53,7 +83,7 @@
             {
                 tipmanager.remove();
             }
-        });
+        }).unbind('mouseover.tip').unbind('mouseout.tip');
     };
 
 
@@ -78,13 +108,17 @@
         x: 0,
         y: 0,
         appendIdTo: null,       //保存ID到那一个对象(jQuery)(待移除)
-        target: null
+        target: null,
+        auto: null,             //是否自动模式，如果是，那么：鼠标经过时显示，移开时关闭,并且当content为空时自动读取attr[title]
+        removeTitle: true        //自动模式时，默认是否移除掉title
     };
 
     //在指定Dom Element右侧显示气泡,通过$.fn.ligerTip调用
     $.ligerDefaults.ElementTip = {
         distanceX: 1,
-        distanceY: -3
+        distanceY: -3,
+        auto: null,
+        removeTitle: true
     };
 
     $.ligerMethos.Tip = {};
@@ -114,7 +148,7 @@
             g.tip.attr("id", g.id);
             if (p.content)
             {
-                $(".l-verify-tip-content", tip).html(p.content);
+                $("> .l-verify-tip-content:first", tip).html(p.content);
                 tip.appendTo('body');
             }
             else
@@ -122,8 +156,8 @@
                 return;
             }
             tip.css({ left: p.x, top: p.y }).show();
-            p.width && $("> .l-verify-tip-content", tip).width(p.width - 8);
-            p.height && $("> .l-verify-tip-content", tip).width(p.height);
+            p.width && $("> .l-verify-tip-content:first", tip).width(p.width - 8);
+            p.height && $("> .l-verify-tip-content:first", tip).width(p.height);
             eee = p.appendIdTo;
             if (p.appendIdTo)
             {
@@ -136,6 +170,10 @@
             }
             p.callback && p.callback(tip);
             g.set(p);
+        },
+        _setContent: function (content)
+        {
+            $("> .l-verify-tip-content:first", this.tip).html(content);
         },
         remove: function ()
         {
@@ -151,8 +189,4 @@
             this.tip.remove();
         }
     });
-
-
-
 })(jQuery);
-

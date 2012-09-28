@@ -1,7 +1,9 @@
 ﻿/**
-* jQuery ligerUI 1.1.6
+* jQuery ligerUI 1.1.9
 * 
-* Author leoxie [ gd_star@163.com ] 
+* http://ligerui.com
+*  
+* Author daomi 2012 [ gd_star@163.com ] 
 * 
 */
 
@@ -9,13 +11,30 @@
 {
     var l = $.ligerui;
 
+    //全局事件
+    $(".l-dialog-btn").live('mouseover', function ()
+    {
+        $(this).addClass("l-dialog-btn-over");
+    }).live('mouseout', function ()
+    {
+        $(this).removeClass("l-dialog-btn-over");
+    });
+    $(".l-dialog-tc .l-dialog-close").live('mouseover', function ()
+    {
+        $(this).addClass("l-dialog-close-over");
+    }).live('mouseout', function ()
+    {
+        $(this).removeClass("l-dialog-close-over");
+    });
+
+
     $.ligerDialog = function ()
     {
         return l.run.call(null, "ligerDialog", arguments, { isStatic: true });
     };
 
     //dialog 图片文件夹的路径 预加载
-    l.DialogImagePath = "/"+  window.location.pathname.split("/")[1]+"/static/skins/Aqua/images/win/";
+    $.ligerui.DialogImagePath = "../../lib/ligerUI/skins/Aqua/images/win/";
 
     function prevImage(paths)
     {
@@ -24,7 +43,7 @@
             $('<img />').attr('src', l.DialogImagePath + paths[i]);
         }
     }
-    prevImage(['dialog.gif', 'dialog-winbtns.gif', 'dialog-bc.gif', 'dialog-tc.gif']);
+    //prevImage(['dialog.gif', 'dialog-winbtns.gif', 'dialog-bc.gif', 'dialog-tc.gif']);
 
     $.ligerDefaults.Dialog = {
         cls: null,       //给dialog附加css class
@@ -109,7 +128,7 @@
                 g.dialog.addClass("l-dialog-win");
             }
             if (p.cls) g.dialog.addClass(p.cls);
-            if (p.id) g.dialog.attr("id", p.id);
+            if (p.id) g.dialog.attr("id", p.id); 
             //设置锁定屏幕、拖动支持 和设置图片
             g.mask();
             if (p.isDrag)
@@ -191,20 +210,7 @@
             });
 
             //设置事件
-            $(".l-dialog-btn", g.dialog.body).hover(function ()
-            {
-                $(this).addClass("l-dialog-btn-over");
-            }, function ()
-            {
-                $(this).removeClass("l-dialog-btn-over");
-            });
-            $(".l-dialog-tc .l-dialog-close", g.dialog).hover(function ()
-            {
-                $(this).addClass("l-dialog-close-over");
-            }, function ()
-            {
-                $(this).removeClass("l-dialog-close-over");
-            }).click(function ()
+            $(".l-dialog-tc .l-dialog-close", g.dialog).click(function ()
             {
                 if (p.isHidden)
                     g.hide();
@@ -604,19 +610,8 @@
         {
             var g = this, p = this.options;
             l.win.removeTask(this);
-            if (g.frame)
-            {
-                $(g.frame.document).ready(function ()
-                {
-                    g.unmask();
-                    g._removeDialog();
-                });
-            }
-            else
-            {
-                g.unmask();
-                g._removeDialog();
-            }
+            g.unmask();
+            g._removeDialog();
             $('body').unbind('keydown.dialog');
         },
         _getVisible: function ()
@@ -668,21 +663,9 @@
         hidden: function ()
         {
             var g = this;
-            l.win.removeTask(this);
-            if (g.frame)
-            {
-                $(g.frame.document).ready(function ()
-                {
-                    g.unmask();
-                    g._hideDialog();
-
-                });
-            }
-            else
-            {
-                g.unmask();
-                g._hideDialog();
-            }
+            l.win.removeTask(g);
+            g.dialog.hide();
+            g.unmask();
         },
         show: function ()
         {
@@ -704,6 +687,8 @@
             {
                 g.dialog.show();
             }
+            //前端显示 
+            $.ligerui.win.setFront.ligerDefer($.ligerui.win, 100, [g]);
         },
         setUrl: function (url)
         {
@@ -725,7 +710,7 @@
         },
         _applyDrag: function ()
         {
-            var g = this;
+            var g = this, p = this.options;
             if ($.fn.ligerDrag)
                 g.draggable = g.dialog.ligerDrag({ handler: '.l-dialog-title', animate: false,
                     onStartDrag: function ()
@@ -734,6 +719,17 @@
                     },
                     onStopDrag: function ()
                     {
+                        if (p.target)
+                        {
+                            var triggers1 = l.find($.ligerui.controls.DateEditor);
+                            var triggers2 = l.find($.ligerui.controls.ComboBox);
+                            //更新所有下拉选择框的位置
+                            $($.merge(triggers1, triggers2)).each(function ()
+                            {
+                                if (this.updateSelectBoxPosition)
+                                    this.updateSelectBoxPosition();
+                            });
+                        }
                         g._saveStatus();
                     }
                 });
@@ -753,7 +749,7 @@
         },
         _applyResize: function ()
         {
-            var g = this;
+            var g = this, p = this.options;
             if ($.fn.ligerResizable)
             {
                 g.resizable = g.dialog.ligerResizable({
@@ -791,7 +787,7 @@
         },
         _setImage: function ()
         {
-            var g = this;
+            var g = this, p = this.options;
             if (p.type)
             {
                 if (p.type == 'success' || p.type == 'donne' || p.type == 'ok')
@@ -833,6 +829,7 @@
             var d = dialogs[i];
             d.destroy.ligerDefer(d, 5);
         }
+        l.win.unmask();
     };
     $.ligerDialog.show = function (p)
     {
@@ -931,7 +928,6 @@
         };
         if (typeof (title) == "string" && title != "") p.title = title;
         $.extend(p, {
-            fixedType: 'se',
             showMax: false,
             showToggle: false,
             showMin: false
@@ -960,7 +956,6 @@
         };
         if (typeof (title) == "string" && title != "") p.title = title;
         $.extend(p, {
-            fixedType: 'se',
             showMax: false,
             showToggle: false,
             showMin: false
@@ -974,7 +969,7 @@
     };
     $.ligerDialog.closeWaitting = function ()
     {
-        var dialogs = l.find(l.controls.Dialog.prototype.__getType());
+        var dialogs = l.find(l.controls.Dialog);
         for (var i in dialogs)
         {
             var d = dialogs[i];

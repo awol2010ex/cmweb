@@ -1,7 +1,9 @@
-/**
-* jQuery ligerUI  1.1.6
+﻿/**
+* jQuery ligerUI 1.1.9
 * 
-* Author leoxie [ gd_star@163.com ] 
+* http://ligerui.com
+*  
+* Author daomi 2012 [ gd_star@163.com ] 
 * 
 */
 
@@ -61,7 +63,7 @@
         InWindow: true,                        //是否以窗口的高度为准 height设置为百分比时可用
         statusName: '__status',                    //状态名
         method: 'post',                         //提交方式
-        async: false,
+        async: true,
         fixedCellHeight: true,                       //是否固定单元格的高度
         heightDiff: 0,                         //高度补差,当设置height:100%时，可能会有高度的误差，可以通过这个属性调整
         cssClass: null,                    //类名
@@ -77,7 +79,7 @@
         onToNext: null,                      //下一页，可以通过return false来阻止操作
         onToLast: null,                      //最后一页，可以通过return false来阻止操作
         allowUnSelectRow: false,           //是否允许反选行 
-        alternatingRow: true,           //间隔行效果
+        alternatingRow: true,           //奇偶行效果
         mouseoverRowCssClass: 'l-grid-row-over',
         enabledSort: true,                      //是否允许排序
         rowAttrRender: null,                  //行自定义属性渲染器(包括style，也可以定义)
@@ -116,7 +118,11 @@
         rowDraggable: false,                         //是否允许行拖拽
         rowDraggingRender: null,
         autoCheckChildren: true,                  //是否自动选中子节点
-        onRowDragDrop: null                    //行拖拽事件
+        onRowDragDrop: null,                    //行拖拽事件
+        rowHeight: 22,                           //行默认的高度
+        headerRowHeight: 23,                    //表头行的高度
+        toolbar: null,                           //工具条,参数同 ligerToolbar的
+        headerImg: null                        //表格头部图标
     };
     $.ligerDefaults.GridString = {
         errorMessage: '发生错误',
@@ -194,6 +200,12 @@
             return format;
         }
         if (!value) return "";
+        // /Date(1328423451489)/
+        if (typeof (value) == "string" && /^\/Date/.test(value))
+        {
+            value = value.replace(/^\//, "new ").replace(/\/$/, "");
+            eval("value = " + value);
+        }
         if (value instanceof Date)
         {
             var format = column.format || this.options.dateFormat || "yyyy-MM-dd";
@@ -201,7 +213,7 @@
         }
         else
         {
-        	if(value.time){//根据ibtais 输出的格式
+            if(value.time){//根据ibtais 输出的格式
         	   var format = column.format || this.options.dateFormat || "yyyy-MM-dd";
                return getFormatDate(new Date(value.time), format);
         	}
@@ -231,11 +243,11 @@
             return input;
         },
         getValue: function (input, editParm)
-        {
+        { 
             return input.liger('option', 'value');
         },
         setValue: function (input, value, editParm)
-        {
+        { 
             input.liger('option', 'value', value);
         },
         resize: function (input, width, height, editParm)
@@ -440,7 +452,7 @@
                         g.beginEdit(record, function (rowdata, column)
                         {
                             var editContainer = $("<div class='l-editbox'></div>");
-                            editContainer.width(120).height(23);
+                            editContainer.width(120).height(p.rowHeight + 1);
                             editContainer.appendTo(container);
                             return editContainer;
                         });
@@ -491,6 +503,7 @@
             var gridhtmlarr = [];
             gridhtmlarr.push("        <div class='l-panel-header'><span class='l-panel-header-text'></span></div>");
             gridhtmlarr.push("                    <div class='l-grid-loading'></div>");
+            gridhtmlarr.push("        <div class='l-panel-topbar'></div>");
             gridhtmlarr.push("        <div class='l-panel-bwarp'>");
             gridhtmlarr.push("            <div class='l-panel-body'>");
             gridhtmlarr.push("                <div class='l-grid'>");
@@ -555,6 +568,8 @@
             g.gridloading = $(".l-grid-loading:first", g.grid);
             //调整列宽层 
             g.draggingline = $(".l-grid-dragging-line", g.grid);
+            //顶部工具栏
+            g.topbar = $(".l-panel-topbar:first", g.grid);
 
             g.gridview = $(".l-grid:first", g.grid);
             g.gridview.attr("id", g.id + "grid");
@@ -596,11 +611,11 @@
             g.set(pc);
             if (!p.delayLoad)
             {
-                if(p.url)
-                   g.set({ url: p.url});
-                else if(p.data)
-                   g.set({data:p.data});
-            }   
+                if (p.url)
+                    g.set({ url: p.url });
+                else if (p.data)
+                    g.set({ data: p.data });
+            }
         },
         _setFrozen: function (frozen)
         {
@@ -640,7 +655,8 @@
             if (p.title) h -= 24;
             if (p.usePager) h -= 32;
             if (p.totalRender) h -= 25;
-            var gridHeaderHeight = 23 * (g._columnMaxLevel - 1) + 22;
+            if (p.toolbar) h -= g.topbar.outerHeight();
+            var gridHeaderHeight = p.headerRowHeight * (g._columnMaxLevel - 1) + p.headerRowHeight - 1;
             h -= gridHeaderHeight;
             if (h > 0)
             {
@@ -667,6 +683,7 @@
         },
         _setUrl: function (value)
         {
+            this.options.url = value;
             if (value)
             {
                 this.options.dataType = "server";
@@ -677,7 +694,8 @@
                 this.options.dataType = "local";
             }
         },
-        _setData: function (value) { 
+        _setData: function (value)
+        {
             this.loadData(this.options.data);
         },
         //刷新数据
@@ -740,8 +758,8 @@
                 }
             };
             $(".l-bar-btnload span", g.toolbar).addClass("l-disabled");
-            if (p.dataType == "local") {
-                
+            if (p.dataType == "local")
+            {
                 g.filteredData = g.data = p.data;
                 if (clause)
                     g.filteredData[p.root] = g._searchData(g.filteredData[p.root], clause);
@@ -766,15 +784,8 @@
             }
             else
             {
-                if (g.hasBind('loading'))
-                {
-                    g.trigger('loading');
-                }
-                else
-                {
-                    g.toggleLoading.ligerDefer(g, 10, [true]);
-                }
-                g.loadServerData.ligerDefer(g, 10, [param, clause]);
+                g.loadServerData(param, clause);
+                //g.loadServerData.ligerDefer(g, 10, [param, clause]);
             }
             g.loading = false;
         },
@@ -789,6 +800,14 @@
                 dataType: 'json',
                 beforeSend: function ()
                 {
+                    if (g.hasBind('loading'))
+                    {
+                        g.trigger('loading');
+                    }
+                    else
+                    {
+                        g.toggleLoading(true);
+                    }
                 },
                 success: function (data)
                 {
@@ -819,6 +838,7 @@
                 },
                 complete: function ()
                 {
+                    g.trigger('complete', [g]);
                     if (g.hasBind('loaded'))
                     {
                         g.trigger('loaded', [g]);
@@ -863,6 +883,7 @@
             if (!p.enabledEdit || p.clickToEdit) return;
             var rowdata = g.getRow(rowParm);
             if (rowdata._editing) return;
+            if (g.trigger('beginEdit', { record: rowdata, rowindex: rowdata['__index'] }) == false) return;
             g.editors[rowdata['__id']] = {};
             rowdata._editing = true;
             g.reRender({ rowdata: rowdata });
@@ -873,13 +894,12 @@
                 g.setCellEditing(rowdata, column, true);
                 return container;
             };
-            if (g.trigger('beginEdit', { record: rowdata, rowindex: rowdata['__index'] }) == false) return;
             for (var i = 0, l = g.columns.length; i < l; i++)
             {
                 var column = g.columns[i];
-                if (!column.name || !column.editor || !column.editor.type || !$.ligerDefaults.Grid.editors[column.editor.type]) continue;
-                var editor = $.ligerDefaults.Grid.editors[column.editor.type];
-                var editParm = { record: rowdata, value: rowdata[column.name], column: column, rowindex: rowdata['__index'] };
+                if (!column.name || !column.editor || !column.editor.type || !p.editors[column.editor.type]) continue;
+                var editor = p.editors[column.editor.type];
+                var editParm = { record: rowdata, value: rowdata[column.name], column: column, rowindex: rowdata['__index'], grid: g };
                 var container = containerBulider(rowdata, column);
                 var width = container.width(), height = container.height();
                 var editorInput = g._createEditor(editor, container, editParm, width, height);
@@ -915,9 +935,9 @@
         },
         addEditRow: function (rowdata)
         {
-            var g = this;
-            rowdata = g.add(rowdata);
-            g.beginEdit(rowdata);
+            this.submitEdit();
+            rowdata = this.add(rowdata);
+            this.beginEdit(rowdata);
         },
         submitEdit: function (rowParm)
         {
@@ -952,12 +972,11 @@
             var g = this, p = this.options;
             if (g.editor.editing)
             {
-                var o = g.editor;
-                if (o.editor.destroy) o.editor.destroy(o.input, o.editParm);
-                g.editor.container.remove();
+                var o = g.editor; 
                 g.trigger('sysEndEdit', [g.editor.editParm]);
                 g.trigger('endEdit', [g.editor.editParm]);
-                g.editor.container;
+                if (o.editor.destroy) o.editor.destroy(o.input, o.editParm);
+                g.editor.container.remove();
                 g.reRender({ rowdata: g.editor.editParm.record, column: g.editor.editParm.column });
                 g.trigger('afterEdit', [g.editor.editParm]);
                 g.editor = { editing: false };
@@ -1286,7 +1305,9 @@
             var listdata = g._getParentChildren(rowdata);
             var index = $.inArray(rowdata, listdata);
             if (index == -1 || index == 0) return;
+            var selected = g.getSelected();
             g.move(rowdata, listdata[index - 1], false);
+            g.select(selected);
         },
         down: function (rowParm)
         {
@@ -1295,7 +1316,9 @@
             var listdata = g._getParentChildren(rowdata);
             var index = $.inArray(rowdata, listdata);
             if (index == -1 || index == listdata.length - 1) return;
+            var selected = g.getSelected();
             g.move(rowdata, listdata[index + 1], true);
+            g.select(selected);
         },
         addRow: function (rowdata, neardata, isBefore, parentRowData)
         {
@@ -1395,7 +1418,7 @@
             var data = [];
             for (var rowid in g.records)
             {
-                var o = $.extend({}, g.records[rowid]);
+                var o = $.extend(true, {}, g.records[rowid]);
                 if (o[p.statusName] == status || status == undefined)
                 {
                     data.push(g.formatRecord(o, removeStatus));
@@ -1578,8 +1601,8 @@
             {
                 g.loadData(p.where);
             }
-            else {
-                debugger
+            else
+            {
                 g.currentData = g._getCurrentPageData(g.filteredData);
                 g._showData();
             }
@@ -2275,9 +2298,24 @@
         {
             var g = this, p = this.options;
             if (p.title)
+            {
                 $(".l-panel-header-text", g.header).html(p.title);
+                if (p.headerImg)
+                    g.header.append("<img src='" + p.headerImg + "' />").addClass("l-panel-header-hasicon");
+            }
             else
+            {
                 g.header.hide();
+            }
+            if (p.toolbar)
+            {
+                if ($.fn.ligerToolBar)
+                    g.toolbarManager = g.topbar.ligerToolBar(p.toolbar);
+            }
+            else
+            {
+                g.topbar.remove();
+            }
         },
         _createColumnId: function (column)
         {
@@ -2447,14 +2485,18 @@
                 jcell.addClass("l-grid-hd-cell-detail");
                 jcell.html("<div class='l-grid-hd-cell-inner'><div class='l-grid-hd-cell-text l-grid-hd-cell-btn-detail'></div></div>");
             }
+            if (column.heightAlign)
+            {
+                $(".l-grid-hd-cell-inner:first", jcell).css("textAlign", column.heightAlign);
+            }
             if (column['__colSpan']) jcell.attr("colSpan", column['__colSpan']);
             if (column['__rowSpan'])
             {
                 jcell.attr("rowSpan", column['__rowSpan']);
-                jcell.height(23 * column['__rowSpan']);
+                jcell.height(p.headerRowHeight * column['__rowSpan']);
             } else
             {
-                jcell.height(23);
+                jcell.height(p.headerRowHeight);
             }
             if (column['__leaf'])
             {
@@ -2537,7 +2579,7 @@
             }
             if (g._columnMaxLevel > 0)
             {
-                var h = 23 * g._columnMaxLevel;
+                var h = p.headerRowHeight * g._columnMaxLevel;
                 g.gridheader.add(g.f.gridheader).height(h);
                 if (p.rownumbers && p.frozenRownumbers) g.f.gridheader.find("td:first").height(h);
             }
@@ -2675,9 +2717,11 @@
             g.recordNumber = 0;
             g.records = {};
             g.rows = [];
-            if (!g.selected)
-                g.selected = [];
+            //清空选择的行
+            g.selected = [];
             g.totalNumber = 0;
+            //编辑器计算器
+            g.editorcounter = 0;
         },
         _fillGridBody: function (data, frozen)
         {
@@ -2716,7 +2760,7 @@
                     gridhtmlarr.push('<td colSpan="' + g.columns.length + '" class="l-grid-grouprow-cell">');
                     gridhtmlarr.push('<span class="l-grid-group-togglebtn">&nbsp;&nbsp;&nbsp;&nbsp;</span>');
                     if (p.groupRender)
-                        gridhtmlarr.push(p.groupRender(groups[i], p.groupColumnDisplay));
+                        gridhtmlarr.push(p.groupRender(groups[i], item, p.groupColumnDisplay));
                     else
                         gridhtmlarr.push(p.groupColumnDisplay + ':' + groups[i]);
 
@@ -2751,8 +2795,8 @@
             var data = g.currentData[p.root];
             if (p.usePager)
             {
-                //更新总记录数 
-                if (g.data && g.data[p.record] && p.dataAction == "server")
+                //更新总记录数
+                if (p.dataAction == "server" && g.data && g.data[p.record])
                     p.total = g.data[p.record];
                 else if (g.filteredData && g.filteredData[p.root])
                     p.total = g.filteredData[p.root].length;
@@ -2826,16 +2870,16 @@
                 gridhtmlarr.push('<tr');
                 gridhtmlarr.push(' id="' + g._getRowDomId(item, frozen) + '"');
                 gridhtmlarr.push(' class="l-grid-row'); //class start 
-                if (g.enabledCheckbox() && p.isChecked && p.isChecked(item))
+                if (!frozen && g.enabledCheckbox() && p.isChecked && p.isChecked(item))
                 {
                     g.select(item);
                     gridhtmlarr.push(' l-selected');
                 }
-                if (g.isSelected(item))
+                else if (g.isSelected(item))
                 {
                     gridhtmlarr.push(' l-selected');
                 }
-                if (rowid % 2 == 1 && p.alternatingRow)
+                if (item['__index'] % 2 == 1 && p.alternatingRow)
                     gridhtmlarr.push(' l-grid-row-alt');
                 gridhtmlarr.push('" ');  //class end
                 if (p.rowAttrRender) gridhtmlarr.push(p.rowAttrRender(item, rowid));
@@ -2862,19 +2906,28 @@
                     //如果是行序号(系统列)
                     if (this.isrownumber)
                     {
-                        gridhtmlarr.push(' class="l-grid-row-cell l-grid-row-cell-rownumbers" style="width:' + this.width + 'px"><div class="l-grid-row-cell-inner">' + (parseInt(item['__index']) + 1) + '</div></td>');
+                        gridhtmlarr.push(' class="l-grid-row-cell l-grid-row-cell-rownumbers" style="width:' + this.width + 'px"><div class="l-grid-row-cell-inner"');
+                        if (p.fixedCellHeight)
+                            gridhtmlarr.push(' style = "height:' + p.rowHeight + 'px;" ');
+                        gridhtmlarr.push('>' + (parseInt(item['__index']) + 1) + '</div></td>');
                         return;
                     }
                     //如果是复选框(系统列)
                     if (this.ischeckbox)
                     {
-                        gridhtmlarr.push(' class="l-grid-row-cell l-grid-row-cell-checkbox" style="width:' + this.width + 'px"><div class="l-grid-row-cell-inner"><span class="l-grid-row-cell-btn-checkbox"></span></div></td>');
+                        gridhtmlarr.push(' class="l-grid-row-cell l-grid-row-cell-checkbox" style="width:' + this.width + 'px"><div class="l-grid-row-cell-inner"');
+                        if (p.fixedCellHeight)
+                            gridhtmlarr.push(' style = "height:' + p.rowHeight + 'px;" ');
+                        gridhtmlarr.push('><span class="l-grid-row-cell-btn-checkbox"></span></div></td>');
                         return;
                     }
                     //如果是明细列(系统列)
                     else if (this.isdetail)
                     {
-                        gridhtmlarr.push(' class="l-grid-row-cell l-grid-row-cell-detail" style="width:' + this.width + 'px"><div class="l-grid-row-cell-inner"><span class="l-grid-row-cell-detailbtn"></span></div></td>');
+                        gridhtmlarr.push(' class="l-grid-row-cell l-grid-row-cell-detail" style="width:' + this.width + 'px"><div class="l-grid-row-cell-inner"');
+                        if (p.fixedCellHeight)
+                            gridhtmlarr.push(' style = "height:' + p.rowHeight + 'px;" ');
+                        gridhtmlarr.push('><span class="l-grid-row-cell-detailbtn"></span></div></td>');
                         return;
                     }
                     var colwidth = this._width;
@@ -2906,8 +2959,8 @@
             var htmlarr = [];
             htmlarr.push('<div class="l-grid-row-cell-inner"');
             //htmlarr.push('<div');
-            htmlarr.push(' style = "width:' + parseInt(column._width - 8) + 'px; ');
-            if (p.fixedCellHeight) htmlarr.push('height:' + 22 + 'px;');
+            htmlarr.push(' style = "width:' + parseInt(column._width - 8) + 'px;');
+            if (p.fixedCellHeight) htmlarr.push('height:' + p.rowHeight + 'px;min-height:' + p.rowHeight + 'px; ');
             if (column.align) htmlarr.push('text-align:' + column.align + ';');
             var content = g._getCellContent(rowdata, column);
             htmlarr.push('">' + content + '</div>');
@@ -2926,9 +2979,9 @@
             {
                 content = column.render.call(g, rowdata, rowindex, value, column);
             }
-            else if ($.ligerDefaults.Grid.formatters[column.type])
+            else if (p.formatters[column.type])
             {
-                content = $.ligerDefaults.Grid.formatters[column.type].call(g, value, column);
+                content = p.formatters[column.type].call(g, value, column);
             }
             else if (value != null)
             {
@@ -2976,12 +3029,12 @@
             if (!column || !column.editor) return;
             var columnname = column.name;
             var columnindex = column.columnindex;
-            if (column.editor.type && $.ligerDefaults.Grid.editors[column.editor.type])
+            if (column.editor.type && p.editors[column.editor.type])
             {
                 var currentdata = rowdata[columnname];
                 var editParm = { record: rowdata, value: currentdata, column: column, rowindex: rowindex };
                 if (g.trigger('beforeEdit', [editParm]) == false) return false;
-                var editor = $.ligerDefaults.Grid.editors[column.editor.type];
+                var editor = p.editors[column.editor.type];
                 var jcell = $(rowcell), offset = $(rowcell).offset();
                 jcell.html("");
                 g.setCellEditing(rowdata, column, true);
@@ -3014,9 +3067,7 @@
         _checkEditAndUpdateCell: function (editParm)
         {
             var g = this, p = this.options;
-            if (g.trigger('beforeSubmitEdit', [editParm]) == false) return false;
-            if (g.editor.editor && g.editor.editor.destroy)
-                g.editor.editor.destroy(g.editor.input, g.editor.editParm);
+            if (g.trigger('beforeSubmitEdit', [editParm]) == false) return false; 
             g.updateCell(editParm.column, editParm.value, editParm.record);
             if (editParm.column.render || g.enabledTotal()) g.reRender({ column: editParm.column });
             g.reRender({ rowdata: editParm.record });
@@ -3048,8 +3099,8 @@
             if (val1 == null && val2 != null) return 1;
             else if (val1 == null && val2 == null) return 0;
             else if (val1 != null && val2 == null) return -1;
-            if ($.ligerDefaults.Grid.sorters[columnType])
-                return $.ligerDefaults.Grid.sorters[columnType].call(g, val1, val2);
+            if (p.sorters[columnType])
+                return p.sorters[columnType].call(g, val1, val2);
             else
                 return val1 < val2 ? -1 : val1 > val2 ? 1 : 0;
         },
@@ -3355,6 +3406,7 @@
                     g.gridheader[0].scrollLeft = scrollLeft;
                 if (scrollTop != null)
                     g.f.gridbody[0].scrollTop = scrollTop;
+                g.endEdit();
                 g.trigger('SysGridHeightChanged');
             });
             //工具条 - 切换每页记录数事件
@@ -3470,7 +3522,7 @@
                             }
                             if (pageX > range.left && pageX < range.right && pageY > range.top && pageY < range.bottom)
                             {
-                                var height = 23;
+                                var height = p.headerRowHeight;
                                 if (col['__rowSpan']) height *= col['__rowSpan'];
                                 g.colDroptip.css({
                                     left: range.left + 5,

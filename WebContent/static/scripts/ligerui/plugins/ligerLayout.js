@@ -1,7 +1,9 @@
 ﻿/**
-* jQuery ligerUI 1.1.6
+* jQuery ligerUI 1.1.9
 * 
-* Author leoxie [ gd_star@163.com ] 
+* http://ligerui.com
+*  
+* Author daomi 2012 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -35,7 +37,10 @@
         allowRightResize: true,     //是否允许 右边可以调整大小
         allowTopResize: true,      //是否允许 头部可以调整大小
         allowBottomResize: true,     //是否允许 底部可以调整大小
-        space: 3 //间隔
+        space: 3, //间隔 
+        onEndResize: null,          //调整大小结束事件
+        minLeftWidth: 80,            //调整左侧宽度时的最小允许宽度
+        minRightWidth: 80           //调整右侧宽度时的最小允许宽度
     };
 
     $.ligerMethos.Layout = {};
@@ -80,7 +85,7 @@
             if ($("> div[position=bottom]", g.layout).length > 0)
             {
                 g.bottom = $("> div[position=bottom]", g.layout).wrap('<div class="l-layout-bottom"></div>').parent();
-                g.bottom.content = $("> div[position=bottom]", g.top);
+                g.bottom.content = $("> div[position=bottom]", g.bottom);
                 if (!g.bottom.content.hasClass("l-layout-content"))
                     g.bottom.content.addClass("l-layout-content");
 
@@ -89,7 +94,15 @@
                 {
                     g.bottom.height(g.bottomHeight);
                 }
-
+                //set title
+                var bottomtitle = g.bottom.content.attr("title");
+                if (bottomtitle)
+                {
+                    g.bottom.header = $('<div class="l-layout-header"></div>');
+                    g.bottom.prepend(g.bottom.header);
+                    g.bottom.header.html(bottomtitle);
+                    g.bottom.content.attr("title", "");
+                }
             }
             //left
             if ($("> div[position=left]", g.layout).length > 0)
@@ -393,7 +406,7 @@
             }
         },
         _onResize: function ()
-        {
+        { 
             var g = this, p = this.options;
             var oldheight = g.layout.height();
             //set layout height 
@@ -444,7 +457,7 @@
             g.middleHeight -= 2;
 
             if (g.hasBind('heightChanged') && g.layoutHeight != oldheight)
-            { 
+            {
                 g.trigger('heightChanged', [{ layoutHeight: g.layoutHeight, diff: g.layoutHeight - oldheight, middleHeight: g.middleHeight}]);
             }
 
@@ -615,10 +628,17 @@
         _stop: function (e)
         {
             var g = this, p = this.options;
+            var diff;
             if (g.xresize && g.xresize.diff != undefined)
             {
+                diff = g.xresize.diff;
                 if (g.dragtype == 'leftresize')
                 {
+                    if (p.minLeftWidth)
+                    {
+                        if (g.leftWidth + g.xresize.diff < p.minLeftWidth)
+                            return;
+                    }
                     g.leftWidth += g.xresize.diff;
                     g.left.width(g.leftWidth);
                     if (g.center)
@@ -628,6 +648,11 @@
                 }
                 else if (g.dragtype == 'rightresize')
                 {
+                    if (p.minRightWidth)
+                    {
+                        if (g.rightWidth - g.xresize.diff < p.minRightWidth)
+                            return;
+                    }
                     g.rightWidth -= g.xresize.diff;
                     g.right.width(g.rightWidth).css({ left: parseInt(g.right.css('left')) + g.xresize.diff });
                     if (g.center)
@@ -638,6 +663,7 @@
             }
             else if (g.yresize && g.yresize.diff != undefined)
             {
+                diff = g.yresize.diff;
                 if (g.dragtype == 'topresize')
                 {
                     g.top.height(g.top.height() + g.yresize.diff);
@@ -674,6 +700,10 @@
                     }
                 }
             }
+            g.trigger('endResize', [{
+                direction: g.dragtype ? g.dragtype.replace(/resize/, '') : '',
+                diff: diff
+            }, e]);
             g._setDropHandlePosition();
             g.draggingxline.hide();
             g.draggingyline.hide();
@@ -684,6 +714,7 @@
             $(document).unbind('mousemove', g._drag);
             $(document).unbind('mouseup', g._stop);
             $('body').css('cursor', '');
+
         }
     });
 

@@ -1,7 +1,9 @@
 ﻿/**
-* jQuery ligerUI 1.1.6
+* jQuery ligerUI 1.1.9
 * 
-* Author leoxie [ gd_star@163.com ] 
+* http://ligerui.com
+*  
+* Author daomi 2012 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -23,7 +25,7 @@
         changeHeightOnResize: false,
         contextmenu: true,
         dblClickToClose: false, //是否双击时关闭
-        dragToMove: true,    //是否允许拖动时改变tab项的位置
+        dragToMove: false,    //是否允许拖动时改变tab项的位置
         onBeforeOverrideTabItem: null,
         onAfterOverrideTabItem: null,
         onBeforeRemoveTabItem: null,
@@ -97,34 +99,51 @@
             g.tab.links = $('<div class="l-tab-links"><ul style="left: 0px; "></ul></div>');
             g.tab.links.prependTo(g.tab);
             g.tab.links.ul = $("ul", g.tab.links);
-            var haslselected = $("> div[lselected=true]", g.tab.content).length > 0;
-            g.selectedTabId = $("> div[lselected=true]", g.tab.content).attr("tabid");
+            var lselecteds = $("> div[lselected=true]", g.tab.content);
+            var haslselected = lselecteds.length > 0;
+            g.selectedTabId = lselecteds.attr("tabid");
             $("> div", g.tab.content).each(function (i, box)
             {
                 var li = $('<li class=""><a></a><div class="l-tab-links-item-left"></div><div class="l-tab-links-item-right"></div></li>');
-                if ($(box).attr("title"))
+                var contentitem = $(this);
+                if (contentitem.attr("title"))
                 {
-                    $("> a", li).html($(box).attr("title"));
+                    $("> a", li).html(contentitem.attr("title"));
+                    contentitem.attr("title", "");
                 }
-                var tabid = $(box).attr("tabid");
+                var tabid = contentitem.attr("tabid");
                 if (tabid == undefined)
                 {
                     tabid = g.getNewTabid();
-                    $(box).attr("tabid", tabid);
-                    if ($(box).attr("lselected"))
+                    contentitem.attr("tabid", tabid);
+                    if (contentitem.attr("lselected"))
                     {
                         g.selectedTabId = tabid;
                     }
                 }
                 li.attr("tabid", tabid);
                 if (!haslselected && i == 0) g.selectedTabId = tabid;
-                var showClose = $(box).attr("showClose");
+                var showClose = contentitem.attr("showClose");
                 if (showClose)
                 {
                     li.append("<div class='l-tab-links-item-close'></div>");
                 }
                 $("> ul", g.tab.links).append(li);
-                if (!$(box).hasClass("l-tab-content-item")) $(box).addClass("l-tab-content-item");
+                if (!contentitem.hasClass("l-tab-content-item")) contentitem.addClass("l-tab-content-item");
+                if (contentitem.find("iframe").length > 0)
+                {
+                    var iframe = $("iframe:first", contentitem);
+                    if (iframe[0].readyState != "complete")
+                    {
+                        if (contentitem.find(".l-tab-loading:first").length == 0)
+                            contentitem.prepend("<div class='l-tab-loading' style='display:block;'></div>");
+                        var iframeloading = $(".l-tab-loading:first", contentitem);
+                        iframe.bind('load.tab', function ()
+                        {
+                            iframeloading.hide();
+                        });
+                    }
+                }
             });
             //init 
             g.selectTabItem(g.selectedTabId);
@@ -518,7 +537,9 @@
                 return;
             }
             var tabitem = $("<li><a></a><div class='l-tab-links-item-left'></div><div class='l-tab-links-item-right'></div><div class='l-tab-links-item-close'></div></li>");
-            var contentitem = $("<div class='l-tab-content-item'><iframe frameborder='0'></iframe></div>");
+            var contentitem = $("<div class='l-tab-content-item'><div class='l-tab-loading' style='display:block;'></div><iframe frameborder='0'></iframe></div>");
+            var iframeloading = $("div:first", contentitem);
+            var iframe = $("iframe:first", contentitem);
             if (g.makeFullHeight)
             {
                 var newheight = g.tab.height() - g.tab.links.height();
@@ -526,14 +547,37 @@
             }
             tabitem.attr("tabid", tabid);
             contentitem.attr("tabid", tabid);
-            $("iframe", contentitem).attr("name", tabid);
-            $("iframe", contentitem).attr("id", tabid);
+            if (url)
+            {
+                iframe.attr("name", tabid)
+                 .attr("id", tabid)
+                 .attr("src", url)
+                 .bind('load.tab', function ()
+                 {
+                     iframeloading.hide();
+                     if (options.callback)
+                         options.callback();
+                 });
+            }
+            else
+            {
+                iframe.remove(); 
+                iframeloading.remove();
+            }
+            if (content)
+            {
+                contentitem.html(content);
+            }
+            else if (options.target)
+            {
+                contentitem.append(options.target);
+            }
             if (showClose == undefined) showClose = true;
             if (showClose == false) $(".l-tab-links-item-close", tabitem).remove();
             if (text == undefined) text = tabid;
             if (height) contentitem.height(height);
             $("a", tabitem).text(text);
-            $("iframe", contentitem).attr("src", url);
+
             g.tab.links.ul.append(tabitem);
             g.tab.content.append(contentitem);
             g.selectTabItem(tabid);
@@ -647,9 +691,14 @@
         reload: function (tabid)
         {
             var g = this, p = this.options;
-            $(".l-tab-content-item[tabid=" + tabid + "] iframe", g.tab.content).each(function (i, iframe)
+            var contentitem = $(".l-tab-content-item[tabid=" + tabid + "]");
+            var iframeloading = $(".l-tab-loading:first", contentitem);
+            var iframe = $("iframe:first", contentitem);
+            var url = $(iframe).attr("src");
+            iframeloading.show();
+            iframe.attr("src", url).unbind('load.tab').bind('load.tab', function ()
             {
-                $(iframe).attr("src", $(iframe).attr("src"));
+                iframeloading.hide();
             });
         },
         removeAll: function (compel)

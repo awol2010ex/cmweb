@@ -1,7 +1,9 @@
 ﻿/**
-* jQuery ligerUI 1.1.6
+* jQuery ligerUI 1.1.9
 * 
-* Author leoxie [ gd_star@163.com ] 
+* http://ligerui.com
+*  
+* Author daomi 2012 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -204,15 +206,6 @@
                     g._toggleSelectBox(true);
                 }
             });
-            //下拉框宽度、高度初始化
-            if (p.selectBoxWidth)
-            {
-                g.selectBox.width(p.selectBoxWidth);
-            }
-            else
-            {
-                g.selectBox.css('width', g.wrapper.css('width'));
-            }
             var itemsleng = $("tr", g.selectBox.table).length;
             if (!p.selectBoxHeight && itemsleng < 8) p.selectBoxHeight = itemsleng * 30;
             if (p.selectBoxHeight)
@@ -223,12 +216,23 @@
             g.bulidContent();
 
             g.set(p);
+
+            //下拉框宽度、高度初始化
+            if (p.selectBoxWidth)
+            {
+                g.selectBox.width(p.selectBoxWidth);
+            }
+            else
+            {
+                g.selectBox.css('width', g.wrapper.css('width'));
+            }
         },
         destroy: function ()
         {
             if (this.wrapper) this.wrapper.remove();
             if (this.selectBox) this.selectBox.remove();
             this.options = null;
+            $.ligerui.remove(this);
         },
         _setDisabled: function (value)
         {
@@ -732,25 +736,36 @@
             //获取值
             return this._getValue();
         },
+        updateStyle: function ()
+        {
+            var g = this, p = this.options;
+            g._dataInit();
+        },
         _dataInit: function ()
         {
             var g = this, p = this.options;
-            var value = null;
-            if (p.initValue != undefined && p.initValue != null
-                    && p.initText != undefined && p.initText != null
-                    )
+            var value = null; 
+            if (p.initValue != null && p.initText != null)
             {
                 g._changeValue(p.initValue, p.initText);
             }
             //根据值来初始化
-            if (p.initValue != undefined && p.initValue != null)
+            if (p.initValue != null)
             {
                 value = p.initValue;
-                var text = g.findTextByValue(value);
-                g._changeValue(value, text);
+                if (p.tree)
+                {
+                    if(value)
+                        g.selectValueByTree(value);
+                }
+                else
+                {
+                    var text = g.findTextByValue(value);
+                    g._changeValue(value, text);
+                }
             }
             //根据文本来初始化 
-            else if (p.initText != undefined && p.initText != null)
+            else if (p.initText != null)
             {
                 value = g.findValueByText(p.initText);
                 g._changeValue(value, p.initText);
@@ -758,8 +773,16 @@
             else if (g.valueField.val() != "")
             {
                 value = g.valueField.val();
-                var text = g.findTextByValue(value);
-                g._changeValue(value, text);
+                if (p.tree)
+                {
+                    if(value)
+                        g.selectValueByTree(value);
+                }
+                else
+                {
+                    var text = g.findTextByValue(value);
+                    g._changeValue(value, text);
+                }
             }
             if (!p.isShowCheckBox && value != null)
             {
@@ -797,6 +820,7 @@
                 });
             }
         },
+        //设置值到 文本框和隐藏域
         _changeValue: function (newValue, newText)
         {
             var g = this, p = this.options;
@@ -880,6 +904,23 @@
                 g._changeValue(value, text);
             });
         },
+        updateSelectBoxPosition: function ()
+        {
+            var g = this, p = this.options;
+            if (p.absolute)
+            {
+                g.selectBox.css({ left: g.wrapper.offset().left, top: g.wrapper.offset().top + 1 + g.wrapper.outerHeight() });
+            }
+            else
+            {
+                var topheight = g.wrapper.offset().top - $(window).scrollTop();
+                var selfheight = g.selectBox.height() + textHeight + 4;
+                if (topheight + selfheight > $(window).height() && topheight > selfheight)
+                {
+                    g.selectBox.css("marginTop", -1 * (g.selectBox.height() + textHeight + 5));
+                }
+            }
+        },
         _toggleSelectBox: function (isHide)
         {
             var g = this, p = this.options;
@@ -902,19 +943,7 @@
             }
             else
             {
-                if (p.absolute)
-                {
-                    g.selectBox.css({ left: g.wrapper.offset().left, top: g.wrapper.offset().top + 1 + g.wrapper.outerHeight() });
-                }
-                else
-                {
-                    var topheight = g.wrapper.offset().top - $(window).scrollTop();
-                    var selfheight = g.selectBox.height() + textHeight + 4;
-                    if (topheight + selfheight > $(window).height() && topheight > selfheight)
-                    {
-                        g.selectBox.css("marginTop", -1 * (g.selectBox.height() + textHeight + 5));
-                    }
-                }
+                g.updateSelectBoxPosition();
                 if (p.slide)
                 {
                     g.selectBox.slideToggle('fast', function ()
@@ -943,8 +972,10 @@
             g.trigger(isHide ? 'hide' : 'show');
         }
     });
+
     $.ligerui.controls.ComboBox.prototype.setValue = $.ligerui.controls.ComboBox.prototype.selectValue;
-
-
+    //设置文本框和隐藏控件的值
+    $.ligerui.controls.ComboBox.prototype.setInputValue = $.ligerui.controls.ComboBox.prototype._changeValue;
+    
 
 })(jQuery);

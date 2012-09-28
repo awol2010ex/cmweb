@@ -1,13 +1,15 @@
 ﻿/**
-* jQuery ligerUI 1.1.6
+* jQuery ligerUI 1.1.9
 * 
-* Author leoxie [ gd_star@163.com ] 
+* http://ligerui.com
+*  
+* Author daomi 2012 [ gd_star@163.com ] 
 * 
 */
 (function ($)
 {
     $.ligerMenu = function (options)
-    { 
+    {
         return $.ligerui.run.call(null, "ligerMenu", arguments);
     };
 
@@ -113,22 +115,22 @@
         removeItem: function (itemid)
         {
             var g = this, p = this.options;
-            $("> .l-menu-item[ligeruimenutemid=" + itemid + "]", g.menu.items).remove();
+            $("> .l-menu-item[menuitemid=" + itemid + "]", g.menu.items).remove();
         },
         setEnabled: function (itemid)
         {
             var g = this, p = this.options;
-            $("> .l-menu-item[ligeruimenutemid=" + itemid + "]", g.menu.items).removeClass("l-menu-item-disable");
+            $("> .l-menu-item[menuitemid=" + itemid + "]", g.menu.items).removeClass("l-menu-item-disable");
         },
         setDisabled: function (itemid)
         {
             var g = this, p = this.options;
-            $("> .l-menu-item[ligeruimenutemid=" + itemid + "]", g.menu.items).addClass("l-menu-item-disable");
+            $("> .l-menu-item[menuitemid=" + itemid + "]", g.menu.items).addClass("l-menu-item-disable");
         },
         isEnable: function (itemid)
         {
             var g = this, p = this.options;
-            return !$("> .l-menu-item[ligeruimenutemid=" + itemid + "]", g.menu.items).hasClass("l-menu-item-disable");
+            return !$("> .l-menu-item[menuitemid=" + itemid + "]", g.menu.items).hasClass("l-menu-item-disable");
         },
         getItemCount: function ()
         {

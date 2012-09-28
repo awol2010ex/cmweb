@@ -1,7 +1,9 @@
 ﻿/**
-* jQuery ligerUI 1.1.6
+* jQuery ligerUI 1.1.9
 * 
-* Author leoxie [ gd_star@163.com ] 
+* http://ligerui.com
+*  
+* Author daomi 2012 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -491,10 +493,11 @@
             g.set(p);
         },
         destroy: function ()
-        { 
+        {
             if (this.textwrapper) this.textwrapper.remove();
             if (this.dateeditor) this.dateeditor.remove();
             this.options = null;
+            $.ligerui.remove(this);
         },
         bulidContent: function ()
         {
@@ -575,6 +578,26 @@
                 });
             });
         },
+        updateSelectBoxPosition: function ()
+        {
+            var g = this, p = this.options;
+            if (p.absolute)
+            {
+                g.dateeditor.css({ left: g.text.offset().left, top: g.text.offset().top + 1 + g.text.outerHeight() });
+            }
+            else
+            {
+                if (g.text.offset().top + 4 > g.dateeditor.height() && g.text.offset().top + g.dateeditor.height() + textHeight + 4 - $(window).scrollTop() > $(window).height())
+                {
+                    g.dateeditor.css("marginTop", -1 * (g.dateeditor.height() + textHeight + 5));
+                    g.showOnTop = true;
+                }
+                else
+                {
+                    g.showOnTop = false;
+                }
+            }
+        },
         toggleDateEditor: function (isHide)
         {
             var g = this, p = this.options;
@@ -589,22 +612,7 @@
             }
             else
             {
-                if (p.absolute)
-                {
-                    g.dateeditor.css({ left: g.text.offset().left, top: g.text.offset().top + 1 + g.text.outerHeight() });
-                }
-                else
-                {
-                    if (g.text.offset().top + 4 > g.dateeditor.height() && g.text.offset().top + g.dateeditor.height() + textHeight + 4 - $(window).scrollTop() > $(window).height())
-                    {
-                        g.dateeditor.css("marginTop", -1 * (g.dateeditor.height() + textHeight + 5));
-                        g.showOnTop = true;
-                    }
-                    else
-                    {
-                        g.showOnTop = false;
-                    }
-                }
+                g.updateSelectBoxPosition();
                 g.dateeditor.slideDown('fast', function ()
                 {
                     g.editorToggling = false;

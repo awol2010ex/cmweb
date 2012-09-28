@@ -1,17 +1,19 @@
 ﻿/**
-* jQuery ligerUI 1.1.6
+* jQuery ligerUI 1.1.9
 * 
-* Author leoxie [ gd_star@163.com ] 
+* http://ligerui.com
+*  
+* Author daomi 2012 [ gd_star@163.com ] 
 * 
 */
 (function ($)
 {
-    
+
     $.ligerMessageBox = function (options)
     {
         return $.ligerui.run.call(null, "ligerMessageBox", arguments, { isStatic: true });
-    }; 
-    
+    };
+
 
     $.ligerDefaults.MessageBox = {
         isDrag: true
@@ -52,7 +54,7 @@
             messageBoxHTML += '        </div>';
             messageBoxHTML += '        <div class="l-messagebox-buttons"><div class="l-messagebox-buttons-inner">';
             messageBoxHTML += '        </div></div>';
-            messageBoxHTML += '    </div>'; 
+            messageBoxHTML += '    </div>';
             g.messageBox = $(messageBoxHTML);
             $('body').append(g.messageBox);
             g.messageBox.close = function ()
@@ -87,6 +89,19 @@
             g._applyWindowMask();
             g._applyDrag();
             g._setImage();
+
+            //位置初始化
+            var left = 0;
+            var top = 0;
+            var width = p.width || g.messageBox.width();
+            if (p.left != null) left = p.left;
+            else p.left = left = 0.5 * ($(window).width() - width);
+            if (p.top != null) top = p.top;
+            else p.top = top = 0.5 * ($(window).height() - g.messageBox.height()) + $(window).scrollTop() - 10;
+            if (left < 0) p.left = left = 0;
+            if (top < 0) p.top = top = 0;
+            g.messageBox.css({ left: left, top: top });
+
             //设置事件
             $(".l-messagebox-btn", g.messageBox).hover(function ()
             {

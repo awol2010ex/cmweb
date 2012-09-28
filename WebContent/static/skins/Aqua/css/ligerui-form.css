@@ -1,15 +1,26 @@
-﻿
+﻿ /* 表单 */
+.l-form { margin:7px;}
+.l-form .l-group{ clear:both; margin:0; height:28px; line-height:28px; font-weight:bold; font-size:12px; color:#333; border-bottom:solid 1px #ebebeb; margin-bottom:14px; display:block; position:relative; clear:both;}
+.l-form .l-group-hasicon{ padding-left:30px;}
+.l-form .l-group-hasicon img{ width:16px; height:16px; position:absolute; left:6px; top:6px;}
+.l-form ul, .l-form li{ list-style:none;}
+.l-form ul{ clear:both; margin-top:2px; margin-bottom:2px;}
+.l-form li{ float:left; overflow:hidden; text-align:left;  line-height:23px;padding:0; padding-top:2px; padding-bottom:2px;} 
+.l-form li textarea{ height:80px;}
+
 .l-hidden{ display:none;}
 /* -------------
    * 多行文本框颜色 *
 * ------------- */ 
 .l-textarea{border:1px solid #A8AAAD; margin-left:-1px;outline:none;}
  .l-textarea:hover{border-color:#01AAEE;}
- l-textarea-invalid,.l-textarea:focus{ border-color:#FF8801;}
+.l-textarea-invalid,.l-textarea:focus{ border-color:#FF8801;}
+.l-textarea-invalid{border-color:#FF7777; background:#FFEEEE url(../image/common/invalid-line.gif) repeat-x bottom;}
+.l-textarea-invalid:hover,.l-textarea-invalid:focus{border-color:#FF7777;}
 /* -------------
    * 文本框/下拉框/日期框/调整器 *
 * ------------- */
-
+.l-text-wrapper{ position:relative;}
 /* 文本框、下来框、日期框、调整器都使用到这个 */
 .l-text
 {
@@ -17,16 +28,19 @@
     border:1px solid #AECAF0; height:20px; line-height:20px;
     width:130px; background:white;
 }
-.l-text-invalid{ border-color:#FF8801;}
+/* 文本框 验证不通过 */
+.l-text-invalid{ border-color:#FF7777; background:#FFEEEE url(../image/common/invalid-line.gif) repeat-x bottom;}
+
+.l-text-invalid .l-text-field{ background:none;}
 /*只读时边框*/
 .l-text-disabled
 {
-    border-color:#C2C2C2!important;
-    background:#E0E0E0!important;
+    border-color:#C2C2C2;
+    background:#E0E0E0;
 }
 /*只读时文本框*/
 .l-text-disabled .l-text-field{
-	background:#E0E0E0!important;
+	background:#E0E0E0;
 }
 /* 编辑状态 */
 .l-text-editing
@@ -108,7 +122,7 @@ background:#DBEBFF url('../images/controls/bg-panel-title.gif') repeat-x left;
     border:1px solid #AECAF0; background:white;
     width:130px; height:120px;
     margin-top:1px;
-    z-index:103; font-size:12px; line-height:18px;
+    z-index:9300; font-size:12px; line-height:18px;
 }
 .l-box-select-absolute
 {
@@ -212,11 +226,11 @@ div.l-disabled a.l-radio-checked
 .l-box-dateeditor-header
 {
     width:100%; height: 23px; background:url(../images/controls/dateeditor-header-bg.gif) repeat-x -2px center; text-align:center;
-    position:relative;
+    position:relative; text-align:center;
 }
 .l-box-dateeditor-header-text
 {
-    margin:0 auto;  color:#1542B3; line-height:23px; font-weight:lighter;
+    margin:0 auto;  color:#1542B3; line-height:23px; font-weight:lighter;text-align:center;
 }
 .l-box-dateeditor-header-text a
 {color:#1542B3; text-decoration:none;cursor:pointer;
@@ -256,12 +270,12 @@ div.l-disabled a.l-radio-checked
 {background-color: #FFE7A2;border: solid 1px #FFBD69;}
 
 .l-box-dateeditor-body thead td{ border-bottom:1px solid #d3d3d3;}
-.l-box-dateeditor-body td{ width:30px; height:19px; line-height:19px; }
+.l-box-dateeditor-body td{ width:30px; height:19px; line-height:19px; font-size:12px; }
 .l-box-dateeditor-body tbody td{border:1px solid white;cursor:pointer;}
 .l-box-dateeditor-body tbody td.l-box-dateeditor-today
-{background-color: #FFBD69;border: solid 1px #FFAB3F;}
+{background-color: #FFBD69; }
 .l-box-dateeditor-body tbody td.l-box-dateeditor-over,.l-box-dateeditor-body tbody td.l-box-dateeditor-selected
- { background-color: #FFE7A2;border: solid 1px #FFBD69;}
+ { background-color: #FFE7A2; }
 .l-box-dateeditor-body tbody td.l-box-dateeditor-holiday
 {
     color:#C00000;
@@ -281,9 +295,13 @@ div.l-disabled a.l-radio-checked
 .l-box-dateeditor-toolbar .l-button {width:50px ; height:19px; line-height:19px; }
 .l-box-dateeditor-toolbar .l-button-today { float:left;margin-left:20px; margin-top:4px;}
 .l-box-dateeditor-toolbar .l-button-close { float:left; margin-left:15px;margin-top:4px;}
+
+
 /* -----------------------
    *   验证 *
 * ----------------------- */
 .l-verify-tip{ padding:0; margin:0;position:absolute; display:block;}
 .l-verify-tip-corner{ padding:0; margin:0;position:absolute;background:url('../images/form/verify-corner.gif') no-repeat; width:8px; line-height:9px; height:9px; overflow:hidden; top:5px; left:0px; z-index:10001;}
 .l-verify-tip-content{margin:0; position:absolute; left:7px;top:0px;border:1px solid #FFC340; background:#FFFCC7; z-index:10000; padding:4px 8px; width:100px; font-size:12px; } 
+
+.l-exclamation{ width:16px; height:16px; overflow:hidden; display:block; background:url('../images/common/exclamation.gif') no-repeat;}
