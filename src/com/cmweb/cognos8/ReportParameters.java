@@ -15,6 +15,9 @@ package com.cmweb.cognos8;
 
 import javax.swing.JOptionPane;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.cognos.developer.schemas.bibus._3.AsynchDetailParameters;
 import com.cognos.developer.schemas.bibus._3.AsynchReply;
 import com.cognos.developer.schemas.bibus._3.AsynchReplyStatusEnum;
@@ -25,8 +28,11 @@ import com.cognos.developer.schemas.bibus._3.ParameterValue;
 import com.cognos.developer.schemas.bibus._3.ParmValueItem;
 import com.cognos.developer.schemas.bibus._3.SearchPathSingleObject;
 import com.cognos.developer.schemas.bibus._3.SimpleParmValueItem;
+
+//报表参数操作类
 public class ReportParameters
 {
+	private final static Logger logger = LoggerFactory.getLogger(ReportParameters.class);
 	/** 
 	 * 
 	 * This Java method calls the getParameters IBM Cognos 8 SDK method to
@@ -152,7 +158,7 @@ public class ReportParameters
 		}
 		catch (Exception e)
 		{
-			System.out.println(e);
+			logger.error("",e);
 			return null;
 		}
 	}

@@ -38,6 +38,7 @@ body {
 
 <script type='text/javascript'>
 
+var searchPathMap ={}; //查询路径缓存
 
 var grid=null;//报表列表
 
@@ -141,6 +142,19 @@ $(function() {
                    }
 
              	  
+               },
+               {
+              	  
+              	  display: '参数', name: 'searchPath', isAllowHide: true ,align:"left" ,
+              	  render :function(row){
+            		  
+            		  var html="";
+            	      html+="<a href='#' onclick=\"editParams('"+row.id+"')\">参数</a>";
+            		  
+            		  return html;
+            	  }
+
+              	  
                }
          ],
          sortName: 'id',
@@ -159,19 +173,53 @@ $(function() {
 	//报表列表管理器
     grid_manager =$("#grid").ligerGetGridManager();
     
-    
+    <%if(request.getParameter("id")==null ){%>
     //已选报表数据
     var  selected_data= top.selected_grid_manager.getData();
     for ( var i = 0; i < selected_data.length; i++) {
-		var data = selected_data[i];
-		
-		grid.addRow(getCleanRow(data));
+		var row = selected_data[i];
+		searchPathMap[row.id]=row.searchPath;//查询路径缓存
+		grid.addRow(getCleanRow(row));
 	}
-
+    <%}%>
   
 
 	
 });
+
+//编辑参数
+function editParams(id){
+	var searchPath= searchPathMap[id];
+	
+	//取得参数
+	Cognos8Dwr.getReportParamters(
+			
+			searchPath ,
+			
+			function(result){
+		        if(result && result.length>0){
+		        	$.ligerDialog.open({ title:"参数设置",  target: $("#param_edit_win") , isResize:true ,width:400,height:300});
+		        	
+		        	var fields=[];
+		        	for(var i=0,s=result.length;i<s;i++){
+		        		fields.push({
+		        			
+		        			name:result[i].name,
+		        			display:result[i].name,
+		        			type: "text"
+		        		});
+		        	}
+		        	//生成参数编辑表单
+		        	$("#param_edit_form").ligerForm({
+		                inputWidth: 170, labelWidth: 90, space: 40,
+		                fields: fields
+		            }); 
+
+		        }
+		
+	        }
+    );
+}
 </script>
 </head>
 <body style="width: 95%; height: 95%;">
@@ -243,6 +291,11 @@ $(function() {
 </form>
 </div>
 
+
+<div id="param_edit_win"
+		style="width: 400px; height: 200px; margin: 3px; display: none;">
+		<form id="param_edit_form"></form>
+</div>
 
 </body>
 </html>
