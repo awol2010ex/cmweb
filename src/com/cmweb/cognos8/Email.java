@@ -111,8 +111,8 @@ public class Email {
 			}
 
 			// Set the run options for the execute method.
-			Option[] execRunOptions = new Option[2];
-			Option[] emailRunOptions = new Option[6];
+			Option[] execRunOptions = new Option[2];// 报表运行参数
+			Option[] emailRunOptions = new Option[6];// 邮件发送参数
 
 			if (response == null) {
 				// Execute the report, specify output format
@@ -148,8 +148,8 @@ public class Email {
 			if (response != null) {
 				// Set the required fields for generating the email output
 				emailRunOptions[0] = setDeliveryMethodEmail();
-				emailRunOptions[1] = setEmailAttach();
-				emailRunOptions[2] = setEmailSubject(emailSubject);
+				emailRunOptions[1] = setEmailAttach();// 附件
+				emailRunOptions[2] = setEmailSubject(emailSubject);// 标题
 
 				// If no email addresses are specified, send the email
 				// message to all contacts.
@@ -189,6 +189,7 @@ public class Email {
 				}
 			} else {
 				logger.info("Response null, unable to issue secondary request.");
+				return "Response null, unable to issue secondary request.";
 			}
 
 			logger.info("The email Java method completed successfully.");
@@ -233,6 +234,7 @@ public class Email {
 		return subjectText;
 	}
 
+	// 是否添加附件
 	public RunOptionBoolean setEmailAttach() {
 		RunOptionBoolean attach = new RunOptionBoolean();
 		attach.setName(RunOptionEnum.emailAsAttachment);

@@ -44,9 +44,9 @@ public class Cognos8Dwr {
 
 	public String emailReport(String emails, String searchPath, int type,
 			String body, String subject, String orgs) {
-		Subject currentUser = SecurityUtils.getSubject();//会话
+		Subject currentUser = SecurityUtils.getSubject();// 会话
 
-		//取得cognos连接
+		// 取得cognos连接
 		CRNConnect connection = (CRNConnect) currentUser.getSession()
 				.getAttribute("connection");
 
@@ -168,42 +168,40 @@ public class Cognos8Dwr {
 		//
 		return returnStr;
 	}
-	
-	
+
 	// 保存定时任务
 	public boolean saveTimeTask(TCmTimeTaskVO vo) {
 		try {
-			TCmTimeTaskVO bean =new TCmTimeTaskVO();
-			if (vo.getId() == null || "".equals(vo.getId().trim())) {//新建
+			TCmTimeTaskVO bean = new TCmTimeTaskVO();
+			if (vo.getId() == null || "".equals(vo.getId().trim())) {// 新建
 				bean = vo;
 				bean.setId(UUIDGenerator.generate());
-				bean.setCreateddatetime(new Timestamp(new Date().getTime()));//新建时间
-				
-			}
-			else{//修改
-				try{
-				     bean =cognos8Service.getTimeTask(vo.getId().trim());//取得定时任务信息
-				     bean.setCron(vo.getCron());//cron表达式
-				     bean.setLastupdateddatetime(new Timestamp(new Date().getTime()));//最后修改时间
-				     bean.setTaskname(vo.getTaskname());//任务名
-				    
-				}catch(Exception e){
-					logger.error("",e);
+				bean.setCreateddatetime(new Timestamp(new Date().getTime()));// 新建时间
+
+			} else {// 修改
+				try {
+					bean = cognos8Service.getTimeTask(vo.getId().trim());// 取得定时任务信息
+					bean.setCron(vo.getCron());// cron表达式
+					bean.setLastupdateddatetime(new Timestamp(new Date()
+							.getTime()));// 最后修改时间
+					bean.setTaskname(vo.getTaskname());// 任务名
+
+				} catch (Exception e) {
+					logger.error("", e);
 				}
 			}
-			
-			bean.setLastupdateddatetime(bean.getCreateddatetime());//最后修改时间
-			
-			
+
+			bean.setLastupdateddatetime(bean.getCreateddatetime());// 最后修改时间
+
 			Subject currentUser = SecurityUtils.getSubject();
-			bean.setUsername((String)currentUser.getSession().getAttribute("j_username"));//登陆用户名
-			bean.setPassword((String)currentUser.getSession().getAttribute("j_password"));//登陆密码
-			
-			
-			cognos8Service.saveTimeTask(bean);//保存到数据库
-			
-			
-			//重启定时任务
+			bean.setUsername((String) currentUser.getSession().getAttribute(
+					"j_username"));// 登陆用户名
+			bean.setPassword((String) currentUser.getSession().getAttribute(
+					"j_password"));// 登陆密码
+
+			cognos8Service.saveTimeTask(bean);// 保存到数据库
+
+			// 重启定时任务
 			cognos8Service.shutdown(bean.getId());
 			cognos8Service.startTask(bean.getId(), bean.getCron());
 		} catch (Exception e) {
@@ -212,16 +210,14 @@ public class Cognos8Dwr {
 		}
 		return true;
 	}
-	
-	
+
 	// 删除定时任务
 	public boolean removeTimeTask(String taskCode) {
 		try {
-			
-			cognos8Service.removeTimeTask(taskCode);//删除定时任务
-			
-			
-			//关闭定时任务
+
+			cognos8Service.removeTimeTask(taskCode);// 删除定时任务
+
+			// 关闭定时任务
 			cognos8Service.shutdown(taskCode);
 		} catch (Exception e) {
 			logger.error("", e);
@@ -229,13 +225,13 @@ public class Cognos8Dwr {
 		}
 		return true;
 	}
-	
-	//取得报表参数列表
-	public  JSONArray getReportParamters(String searchPath){
-		
-		Subject currentUser = SecurityUtils.getSubject();//会话
 
-		//取得cognos连接
+	// 取得报表参数列表
+	public JSONArray getReportParamters(String searchPath) {
+
+		Subject currentUser = SecurityUtils.getSubject();// 会话
+
+		// 取得cognos连接
 		CRNConnect connection = (CRNConnect) currentUser.getSession()
 				.getAttribute("connection");
 		BaseClass report = null;// 报表对象
@@ -254,35 +250,35 @@ public class Cognos8Dwr {
 				logger.error("", e);
 			}
 		}
-		
+
 		if (report != null) {
 			BaseClassWrapper reportObject = new BaseClassWrapper(report);
-			
-			try {//查询出参数列表
-				BaseParameter[]   params =new ReportParameters().getReportParameters(reportObject, connection);
-				
-				if(params!=null && params.length>0){
-					
-					JSONArray result =new JSONArray();
-					
-					for(BaseParameter param:params){
-						result.add(new JSONObject()
-						               .element("name",param.getName())//参数名
-						               .element("type", param.getType().getValue())//参数类型
-								);
-						
+
+			try {// 查询出参数列表
+				BaseParameter[] params = new ReportParameters()
+						.getReportParameters(reportObject, connection);
+
+				if (params != null && params.length > 0) {
+
+					JSONArray result = new JSONArray();
+
+					for (BaseParameter param : params) {
+						result.add(new JSONObject().element("name",
+								param.getName())// 参数名
+								.element("type", param.getType().getValue())// 参数类型
+						);
+
 					}
-					
-					return result ;
+
+					return result;
 				}
-				
+
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
-				logger.error("",e);
+				logger.error("", e);
 			}
 		}
-		
-		
+
 		return null;
 	}
 }

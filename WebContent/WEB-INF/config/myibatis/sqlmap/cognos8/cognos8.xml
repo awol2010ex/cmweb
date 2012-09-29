@@ -29,7 +29,7 @@ GROUP BY
     LOG.SEARCHPATH,
     LOG.SENDER,
     LOG.REPORTID
-	     
+	     order by LOG.CREATEDDATETIME desc
 	     
     </select>
     <!--  取得发送日志行数 -->

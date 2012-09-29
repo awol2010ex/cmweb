@@ -147,7 +147,7 @@ $(function (){
                     			 ||
                     			 row.className =='com.cognos.developer.schemas.bibus._3.Shortcut'//报表链接
                     		  ){
-                    			  searchPathMap[row.id]=row.searchPath;//查询路径缓存
+                    			  searchPathMap[row.id]={searchPath:row.searchPath,name:row.name };//查询路径缓存
                     			  //显示发邮件按钮
                     			  html+="<a href='#' onclick=\"sendMail('"+row.id+"')\"> 发邮件 </a>&nbsp;"
                     			  +"<a href='#' onclick=\"viewLog('"+row.id+"')\"> 查看日志 </a>&nbsp;";
@@ -228,6 +228,7 @@ $(function (){
            
          //发送邮件
            $("#sendMailBtn").click(function(){
+        	   var  waiting =$.ligerDialog.waitting('正在发送邮件中,请稍候...');
         	   Cognos8Dwr.emailReport(
         			   $("#Text_sendMail_addr").val(),
         			   $("#Text_searchPath").val(),
@@ -236,7 +237,9 @@ $(function (){
         			   $("#Text_sendMail_body").val(),
         			   $("#Text_sendMail_org").ligerGetComboBoxManager().getValue(),
         	       function(result){
-        		      alert(result);
+        			   waiting.close();
+        		       alert(result);
+        		       send_mail_dialog.hide();
         		   
         	       }
         	   );
@@ -280,7 +283,7 @@ $(function (){
            });
            
            
-           //发送邮件类型
+           //发送邮件类型下拉框
            $("#Text_sendMail_type_show").ligerComboBox({  
         	   width:250,
                data: [
@@ -296,12 +299,16 @@ $(function (){
 
 
 
-
+var send_mail_dialog =null ;//发送邮件窗口
 //发邮件
 function sendMail(id){
-	 $.ligerDialog.open({ title:"发送邮件设置",  target: $("#send_email_form") , isResize:true ,width:400,height:300});
+	 send_mail_dialog=$.ligerDialog.open({ title:"发送邮件设置",  target: $("#send_email_form") , isResize:true ,width:400,height:300});
 	 
-	 $("#Text_searchPath").val(searchPathMap[id]);//显示搜索路径
+	 $("#Text_searchPath").val(searchPathMap[id].searchPath);//显示搜索路径
+	 
+	 $("#Text_sendMail_subject").val(searchPathMap[id].name);//邮件标题
+	 
+	 $("#Text_sendMail_body").val("");//邮件标题
 }
 //查看日志
 function viewLog(id){
