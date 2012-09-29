@@ -13,6 +13,11 @@
 	src='<%=request.getContextPath() %>/dwr/interface/Cognos8Dwr.js'></script>
 <script type='text/javascript'
 	src='<%=request.getContextPath() %>/dwr/engine.js'></script>
+	
+
+<script type='text/javascript'
+	src='<%=request.getContextPath() %>/static/scripts/json2.js'></script>
+
 <style type="text/css">
 body {
 	font-size: 12px;
@@ -145,33 +150,91 @@ $(function() {
                },
                {
               	  
-              	  display: '参数', name: 'searchPath', isAllowHide: true ,align:"left" ,
-              	  render :function(row){
+              	  display: '参数', name: 'params', isAllowHide: true ,align:"center" ,
+              	  render :function(row,i){
+              		  var html="";
+              		  if(!row.params || row.params==''){
             		  
-            		  var html="";
-            	      html+="<a href='#' onclick=\"editParams('"+row.id+"')\">参数</a>";
-            		  
+            	          html+="<a href=\"javascript:editParams('"+row.id+"',"+i+")\">参数</a>";
+              	      }
+              		  else{
+              			  html+="<a href=\"javascript:editParams('"+row.id+"',"+i+")\">"+row.params+"</a>";
+              		  }
             		  return html;
             	  }
 
               	  
                }
          ],
+         data:{"Total":0 ,Rows:[]},
          sortName: 'id',
          showTitle: false,
          dataAction:'local',
-         pageSize: 10,
-         height:"90%",
          enabledEdit: false,
-         pageSizeOptions: [10,50,100],
          rownumbers:true,
-
-         colDraggable:true
+         height:"90%",
+         width:"100%",
+         colDraggable:true,
+         usePager: false
 
      });
 
 	//报表列表管理器
     grid_manager =$("#grid").ligerGetGridManager();
+    
+    
+
+  //选择部门下拉树
+    $("#Text_sendMail_org").ligerComboBox({
+        width: 250,
+        selectBoxWidth: 250,
+        selectBoxHeight: 400, valueField: 'UID',textField: 'name', treeLeafOnly: false,
+        split:",",
+        tree: { 
+     	   url: '<%=contextPath%>/restful/org/list/',
+     	   checkbox:true,
+     	   nodeWidth : 200,
+			   textFieldName : 'name',
+            slide: false,
+			   idFieldName:"id",
+			   isLeaf:function(data){
+					//这是BUG吧,为什么isLeaf 是 true ,hasChildren 就是true呢,看源代码
+					return true;
+			   },
+			   onBeforeExpand : function(node) {
+				 //防止重复加载,使用isloaded 标记
+                if($("#"+node.data.ORG_CODE).data("isloaded")){
+                   return; 
+                }
+					var params = {};
+					if (node.data && node.data.UID) {
+						params.pid = node.data.UID;//展开节点的ID
+					}
+					
+					this
+							.loadData(
+									$("#"+node.data.ORG_CODE)[0],
+									'<%=contextPath%>/restful/org/list/',
+									params);
+					$("#"+node.data.ORG_CODE).data("isloaded",true)
+			  }
+        }
+    });
+    
+    
+    //发送邮件类型
+    $("#Text_sendMail_type_show").ligerComboBox({  
+ 	   width:250,
+        data: [
+            { text: 'HTML', id: '0' },
+            { text: 'XML', id: '1' },
+            { text: 'PDF', id: '2' },
+            { text: 'CSV', id: '3' },
+            { text: 'XLS', id: '4' }
+        ], valueFieldID: 'Text_sendMail_type'
+    });
+
+	
     
     <%if(request.getParameter("id")==null ){%>
     //已选报表数据
@@ -183,22 +246,61 @@ $(function() {
 	}
     <%}%>
   
-
-	
 });
 
 //编辑参数
-function editParams(id){
+function editParams(id  ,index){
 	var searchPath= searchPathMap[id];
-	
+
+	var  waiting =$.ligerDialog.waitting('正在打开中,请稍候...');
 	//取得参数
 	Cognos8Dwr.getReportParamters(
 			
 			searchPath ,
 			
 			function(result){
+				
+				waiting.close();
+				
+				
 		        if(result && result.length>0){
-		        	$.ligerDialog.open({ title:"参数设置",  target: $("#param_edit_win") , isResize:true ,width:400,height:300});
+		        	$.ligerDialog.open({ 
+		        		title:"参数设置",  
+		        		target: $("#param_edit_win") ,
+		        		isResize:true ,
+		        		width:400,
+		        		height:300,
+		        		buttons:[
+		        		   {
+		        			   
+		        			text:"确定",onclick: function(item, dialog){
+		        				
+		        				var _params ={};//参数值
+		        				var _fields =$("#param_edit_form").data("fields");
+		        				if(_fields && _fields.length>0){
+		        					for(var i=0,s=_fields.length;i<s;i++){
+		        						_params[_fields[i].name] = $("#"+_fields[i].name).val();
+		        					}
+		        				}
+		        				
+		        				var _params_str= JSON.stringify(_params);//参数值
+		        				
+		        				//更新字段
+		        				grid_manager.updateCell("params" ,_params_str , grid_manager.getRowObj(parseInt($("#param_edit_form").data("index"))));
+		        				
+		        				dialog.hide();
+		        		    }
+		        		   
+		        		   }   ,
+		        		   {
+		        			   
+			        		text:"取消",onclick: function(item, dialog){
+			        			dialog.hide();
+			        		}
+			        		   
+			        	   } 
+		        		]
+		        	});
 		        	
 		        	var fields=[];
 		        	for(var i=0,s=result.length;i<s;i++){
@@ -214,8 +316,20 @@ function editParams(id){
 		                inputWidth: 170, labelWidth: 90, space: 40,
 		                fields: fields
 		            }); 
+		        	$("#param_edit_form").data("fields",fields);//字段列表寄存
+		        	$("#param_edit_form").data("index",index);//行数寄存
+		        	
+		        	
+		        	
+		        	for(var i=0,s=result.length;i<s;i++){
+		        		$("#"+result[i].name).val("");
+		        	}
 
 		        }
+		        else{
+		        	alert("没有参数");
+		        }
+				
 		
 	        }
     );
@@ -224,8 +338,8 @@ function editParams(id){
 </head>
 <body style="width: 95%; height: 95%;">
 <div position="center">
-<form id="form1">
-<table cellpadding="0" cellspacing="0" class="l-table-edit">
+<form id="form1" width="100%">
+<table cellpadding="0" cellspacing="0" class="l-table-edit" width="100%">
 
 	<tr>
 
@@ -233,7 +347,7 @@ function editParams(id){
 
 		<td align="left" class="l-table-edit-td" width="70%" colspan="2"><input
 			name="id" type="text" id="id" ltype="text" field_name="id"
-			style="width: 400px" value="${bean.id}" readonly="true"/></td>
+			style="width: 250px" value="${bean.id}" readonly="true"/></td>
 
 		<td align="left" width="100%"></td>
 
@@ -244,7 +358,7 @@ function editParams(id){
 
 		<td align="left" class="l-table-edit-td" colspan="2"><input
 			name="taskname" type="text" id="taskname" ltype="text" field_name="taskname"
-			style="width: 400px" value="${bean.taskname}"/></td>
+			style="width: 250px" value="${bean.taskname}"/></td>
 
 		<td align="left" width="100%"></td>
 
@@ -255,9 +369,9 @@ function editParams(id){
 
 		<td align="left" class="l-table-edit-td" ><input
 			name="cron" type="text" id="cron" ltype="text" field_name="cron"
-			style="width: 400px" value="${bean.cron}"  readOnly="true"/></td>
+			style="width: 250px" value="${bean.cron}"  readOnly="true"/></td>
 
-        <td align="left" >
+        <td align="left" class="l-table-edit-td">
             <input
 			type="button" value="选择" id="Button3"
 			class="l-button l-button-submit" />
@@ -267,12 +381,39 @@ function editParams(id){
 		<td align="left" width="100%"></td>
 
 	</tr>
-	
+	<tr>
+				<td  align="left" class="l-table-edit-td">发送类型:</td>
+				<td  align="left" class="l-table-edit-td" colspan="2">
+				<input
+					name="Text_sendMail_type_show" type="text" id="Text_sendMail_type_show"
+					ltype="text" style="width: 250px;" />
+				<input
+					name="Text_sendMail_type" type="text" id="Text_sendMail_type"
+					ltype="text" style="width: 250px;display:none" />
+				</td>
+				<td align="left" width="100%"></td>
+	</tr>
+	<tr>
+				<td  align="left" class="l-table-edit-td">发送邮件地址:</td>
+				<td  align="left" class="l-table-edit-td" colspan="2"><input
+					name="Text_sendMail_addr" type="text" id="Text_sendMail_addr"
+					ltype="text" style="width: 250px;" />
+				</td>
+				<td align="left" width="100%"></td>
+	</tr>
+	<tr>
+				<td align="left" class="l-table-edit-td">发送目标部门:</td>
+				<td  align="left" class="l-table-edit-td" colspan="2"><input
+					name="Text_sendMail_org" type="text" id="Text_sendMail_org"
+					ltype="text" style="width: 250px;" />
+				</td>
+				<td align="left" width="100%"></td>
+	</tr>
 	<tr>
 	
 	    <td colspan="4" style="padding:10px">
 	      <!-- 已选报表列表 -->
-	       <div id="grid"></div>
+	       <div id="grid" style="width:100%"></div>
 	    </td>
 	</tr>
 	
@@ -291,7 +432,7 @@ function editParams(id){
 </form>
 </div>
 
-
+<!-- 参数编辑窗口 -->
 <div id="param_edit_win"
 		style="width: 400px; height: 200px; margin: 3px; display: none;">
 		<form id="param_edit_form"></form>

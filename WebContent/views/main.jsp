@@ -248,7 +248,6 @@ $(function (){
                selectBoxWidth: 250,
                selectBoxHeight: 400, valueField: 'UID',textField: 'name', treeLeafOnly: false,
                split:",",
-               absolute:false,
                tree: { 
             	   url: '<%=contextPath%>/restful/org/list/',
             	   checkbox:true,
@@ -284,7 +283,6 @@ $(function (){
            //发送邮件类型
            $("#Text_sendMail_type_show").ligerComboBox({  
         	   width:250,
-        	   absolute:false,
                data: [
                    { text: 'HTML', id: '0' },
                    { text: 'XML', id: '1' },
