@@ -43,7 +43,7 @@ public class Cognos8Dwr {
 	private SSOAuthManager ssoAuthManager;// SSO相关信息操作类
 
 	public String emailReport(String emails, String searchPath, int type,
-			String body, String subject, String orgs) {
+			String body, String subject, String orgs ,String params) {
 		Subject currentUser = SecurityUtils.getSubject();// 会话
 
 		// 取得cognos连接
@@ -111,7 +111,10 @@ public class Cognos8Dwr {
 						// 发送邮件
 						returnStr = cognos8Service.emailReport(connection,
 								reportObject, body, subject, type, smtpList,
-								null);
+								null
+								
+								,JSONArray .fromObject(params)//报表参数
+								);
 					} else {
 						returnStr = "邮件地址不正确";
 					}

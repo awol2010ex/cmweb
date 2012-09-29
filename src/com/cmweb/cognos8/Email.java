@@ -26,6 +26,9 @@ package com.cmweb.cognos8;
  *      other requests, improving performance.
  */
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +38,6 @@ import com.cognos.developer.schemas.bibus._3.AsynchReplyStatusEnum;
 import com.cognos.developer.schemas.bibus._3.AsynchRequest;
 import com.cognos.developer.schemas.bibus._3.AsynchSecondaryRequest;
 import com.cognos.developer.schemas.bibus._3.BaseClass;
-import com.cognos.developer.schemas.bibus._3.BaseParameter;
 import com.cognos.developer.schemas.bibus._3.Contact;
 import com.cognos.developer.schemas.bibus._3.DeliveryOptionAddressSMTPArray;
 import com.cognos.developer.schemas.bibus._3.DeliveryOptionEnum;
@@ -44,6 +46,7 @@ import com.cognos.developer.schemas.bibus._3.DeliveryOptionString;
 import com.cognos.developer.schemas.bibus._3.MemoPartString;
 import com.cognos.developer.schemas.bibus._3.Option;
 import com.cognos.developer.schemas.bibus._3.ParameterValue;
+import com.cognos.developer.schemas.bibus._3.ParmValueItem;
 import com.cognos.developer.schemas.bibus._3.PropEnum;
 import com.cognos.developer.schemas.bibus._3.QueryOptions;
 import com.cognos.developer.schemas.bibus._3.RunOptionBoolean;
@@ -51,6 +54,7 @@ import com.cognos.developer.schemas.bibus._3.RunOptionEnum;
 import com.cognos.developer.schemas.bibus._3.RunOptionStringArray;
 import com.cognos.developer.schemas.bibus._3.SearchPathMultipleObject;
 import com.cognos.developer.schemas.bibus._3.SearchPathSingleObject;
+import com.cognos.developer.schemas.bibus._3.SimpleParmValueItem;
 import com.cognos.developer.schemas.bibus._3.SmtpContentDispositionEnum;
 import com.cognos.developer.schemas.bibus._3.Sort;
 
@@ -90,7 +94,7 @@ public class Email {
 	 */
 	public String emailReport(CRNConnect connection, BaseClassWrapper report,
 			String bodyText, String emailSubject, int emailFormat,
-			AddressSMTP[] emails, AsynchRequest response) {
+			AddressSMTP[] emails, AsynchRequest response, JSONArray params) {
 		AsynchReply asynchReply = null;
 		String reportPath = report.getBaseClassObject().getSearchPath()
 				.getValue();
@@ -102,6 +106,27 @@ public class Email {
 			// Get the list of parameters used by the report, including
 			// optional parameters.
 			ParameterValue reportParameters[] = new ParameterValue[] {};
+			// 设置参数
+			if (params != null && params.size() > 0) {
+
+				reportParameters = new ParameterValue[params.size()];
+				for (int i = 0, s = params.size(); i < s; i++) {
+					JSONObject obj = params.getJSONObject(i);
+					String name = obj.getString("name");// 参数名
+					ParameterValue p = new ParameterValue();
+					p.setName(name);
+					SimpleParmValueItem item = new SimpleParmValueItem();
+					item.setDisplay(obj.getString("value"));// 参数值
+					item.setUse(obj.getString("value"));// 参数值
+
+					p.setValue(new ParmValueItem[] { item });// 设置参数值
+
+					reportParameters[i] = p;
+				}
+			}
+			//
+
+			/*
 			ReportParameters repParms = new ReportParameters();
 			BaseParameter[] prm = repParms.getReportParameters(report,
 					connection);
@@ -109,7 +134,7 @@ public class Email {
 			if (prm != null && prm.length > 0) {
 				reportParameters = ReportParameters.setReportParameters(prm);
 			}
-
+           */
 			// Set the run options for the execute method.
 			Option[] execRunOptions = new Option[2];// 报表运行参数
 			Option[] emailRunOptions = new Option[6];// 邮件发送参数

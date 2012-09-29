@@ -98,9 +98,10 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 	// 根据报表发邮件
 	public String emailReport(CRNConnect connection, BaseClassWrapper report,
 			String bodyText, String emailSubject, int emailFormat,
-			AddressSMTP[] emails, AsynchRequest response) {
+			AddressSMTP[] emails, AsynchRequest response, JSONArray params// 报表参数
+	) {
 		return new Email().emailReport(connection, report, bodyText,
-				emailSubject, emailFormat, emails, response);
+				emailSubject, emailFormat, emails, response,params);
 	}
 
 	private static Map<String, ITask> tasks = new HashMap<String, ITask>();// 当前定时任务列表
@@ -144,9 +145,7 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 	// 启动定时任务
 	public ITask startTask(String taskCode, String express) throws Exception {
 		// TODO Auto-generated method stub
-		
-		
-		
+
 		ITask task = null;
 
 		TCmTimeTaskVO svo = null;
@@ -157,14 +156,13 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 		}
 		if (svo != null) {
 			// 启动任务
-			task =new TCmTimeTaskExecutor(svo);//取得定时任务实例
+			task = new TCmTimeTaskExecutor(svo);// 取得定时任务实例
 			task.startTask(svo.getCron());
 			addTask(taskCode, task);
 		}
 
 		return null;
 	}
-
 
 	// 保存发送日志
 	@Transactional
@@ -212,8 +210,7 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 	@Transactional
 	public void saveTimeTask(TCmTimeTaskVO vo) throws Exception {
 		tCmTimeTaskDAO.save(vo);
-		
-		
+
 	}
 
 	// 取得定时任务列表
@@ -227,15 +224,15 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 
 		return result;
 	}
-	
-	//取得所有定时任务
+
+	// 取得所有定时任务
 	@Transactional
-	public List<TCmTimeTaskVO>  getAllTimeTask()throws Exception{
+	public List<TCmTimeTaskVO> getAllTimeTask() throws Exception {
 		return tCmTimeTaskDAO.getAll();
 	}
-	
-	//启动定时任务
-	@PostConstruct 
+
+	// 启动定时任务
+	@PostConstruct
 	public void initTimeTasks() {
 		List<TCmTimeTaskVO> list = null;// 定时任务列表
 		try {
@@ -249,15 +246,14 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 
 			for (int i = 0, s = list.size(); i < s; i++) {
 				TCmTimeTaskVO vo = (TCmTimeTaskVO) list.get(i);
-				
-				//防止重复加载
+
+				// 防止重复加载
 				Object obj = tasks.get(vo.getId());
 
 				if (obj != null) {
 					continue;
 				}
-				
-				
+
 				String taskName = vo.getTaskname();// 任务名称
 				logger.info("开始启动定时任务--" + taskName);
 				try {
@@ -270,10 +266,10 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 			}
 		}
 	}
-	
-	//删除定时任务
+
+	// 删除定时任务
 	@Transactional
-	public void removeTimeTask(String taskCode) throws Exception{
+	public void removeTimeTask(String taskCode) throws Exception {
 		tCmTimeTaskDAO.delete(taskCode);
 	}
 }

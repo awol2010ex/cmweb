@@ -15,7 +15,8 @@
 	src='<%=request.getContextPath() %>/dwr/interface/Cognos8Dwr.js'></script>
 <script type='text/javascript'
 	src='<%=request.getContextPath() %>/dwr/engine.js'></script>	
-	
+<script type='text/javascript'
+	src='<%=request.getContextPath() %>/static/scripts/json2.js'></script>
 <script type='text/javascript'>
 var tree = null; ;//报表目录树
 
@@ -229,13 +230,33 @@ $(function (){
          //发送邮件
            $("#sendMailBtn").click(function(){
         	   var  waiting =$.ligerDialog.waitting('正在发送邮件中,请稍候...');
+        	   
+        	   var  fields=$("#param_edit_form").data("fields");//字段列表
+        	   
+        	   var params= "[]";//报表参数值
+        	   
+        	   if(fields && fields.length>0){
+        		  var array=[];
+        	      for(var i=0,s=fields.length;i<s;i++){
+        	    	var obj ={};
+        	    	obj.name =fields[i].name;
+        	    	obj.value =$("#"+fields[i].name).val();
+	        		array.push(obj);
+	              }
+        	      params = JSON.stringify(array);
+        	   }
+        	   
+        	   
+        	   
         	   Cognos8Dwr.emailReport(
         			   $("#Text_sendMail_addr").val(),
         			   $("#Text_searchPath").val(),
         			   parseInt($("#Text_sendMail_type").val()),
-        			   $("#Text_sendMail_subject").val(),
+
         			   $("#Text_sendMail_body").val(),
+        			   $("#Text_sendMail_subject").val(),
         			   $("#Text_sendMail_org").ligerGetComboBoxManager().getValue(),
+        			   params,
         	       function(result){
         			   waiting.close();
         		       alert(result);
@@ -300,7 +321,7 @@ $(function (){
 
 
 var send_mail_dialog =null ;//发送邮件窗口
-//发邮件
+//打开发邮件窗口
 function sendMail(id){
 	 send_mail_dialog=$.ligerDialog.open({ title:"发送邮件设置",  target: $("#send_email_form") , isResize:true ,width:400,height:300});
 	 
@@ -309,6 +330,48 @@ function sendMail(id){
 	 $("#Text_sendMail_subject").val(searchPathMap[id].name);//邮件标题
 	 
 	 $("#Text_sendMail_body").val("");//邮件标题
+	 
+	 
+
+	   var  waiting =$.ligerDialog.waitting('正在取得报表参数中,请稍候...');
+		//取得参数
+		Cognos8Dwr.getReportParamters(
+				
+				searchPathMap[id].searchPath ,
+				
+				function(result){
+					
+					waiting.close();
+					
+					
+			        if(result && result.length>0){
+			        	
+			        	var fields=[];
+			        	for(var i=0,s=result.length;i<s;i++){
+			        		fields.push({
+			        			
+			        			name:result[i].name,
+			        			display:result[i].name,
+			        			type: "text"
+			        		});
+			        	}
+			        	//生成参数编辑表单
+			        	$("#param_edit_form").ligerForm({
+			                inputWidth: 170, labelWidth: 90, space: 40,
+			                fields: fields
+			            }); 
+			        	
+			        	$("#param_edit_form").data("fields",fields);
+			        	
+			        	for(var i=0,s=result.length;i<s;i++){
+			        		$("#"+result[i].name).val("");
+			        	}
+
+			        }
+					
+			
+		        }
+	    );
 }
 //查看日志
 function viewLog(id){
@@ -480,6 +543,12 @@ function viewLog(id){
 					name="Text_sendMail_org" type="text" id="Text_sendMail_org"
 					ltype="text" style="width: 250px;" />
 				</td>
+			</tr>
+			
+			<tr>
+			    <td colspan="4">
+			    <form id="param_edit_form"></form><!-- 参数修改窗口 -->
+			    </td>
 			</tr>
 			<tr>
           <td colspan="2" style="padding:5px" align="center">

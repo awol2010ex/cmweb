@@ -3,6 +3,7 @@ package com.cmweb.cognos8.service;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import com.cmweb.cognos8.BaseClassWrapper;
@@ -29,7 +30,8 @@ public interface ICognos8Service {
 	// 根据报表发邮件
 	public String emailReport(CRNConnect connection, BaseClassWrapper report,
 			String bodyText, String emailSubject, int emailFormat,
-			AddressSMTP[] emails, AsynchRequest response);
+			AddressSMTP[] emails, AsynchRequest response, JSONArray params// 报表参数
+			);
 	
 	//初始化定时任务
 	public void init() throws Exception;
