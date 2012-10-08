@@ -33,6 +33,17 @@ public class TCmTimeTaskVO implements java.io.Serializable{
 	private String password ;
 
 	private String cron ;//定时表达式
+	
+	
+	private String sendmailtype ; //发送邮件类型（HTML,XLS,CSV...）
+	
+	private String sendmailtypename ; //发送邮件类型名（HTML,XLS,CSV...）
+	
+	private String sendmailaddr ;//发送邮箱地址(分号分隔)
+	
+	private String sendmailorg ;//发送部门ID(逗号分隔)
+	
+	private String sendmailorgname ;//发送部门名称(逗号分隔)
 	@Id
 	@Column(name = "id")
 	public String getId() {
@@ -90,5 +101,45 @@ public class TCmTimeTaskVO implements java.io.Serializable{
 
 	public void setLastupdateddatetime(Timestamp lastupdateddatetime) {
 		this.lastupdateddatetime = lastupdateddatetime;
+	}
+	@Column(name = "sendmailtype")
+	public String getSendmailtype() {
+		return sendmailtype;
+	}
+
+	public void setSendmailtype(String sendmailtype) {
+		this.sendmailtype = sendmailtype;
+	}
+	@Column(name = "sendmailaddr")
+	public String getSendmailaddr() {
+		return sendmailaddr;
+	}
+
+	public void setSendmailaddr(String sendmailaddr) {
+		this.sendmailaddr = sendmailaddr;
+	}
+	@Column(name = "sendmailorg")
+	public String getSendmailorg() {
+		return sendmailorg;
+	}
+
+	public void setSendmailorg(String sendmailorg) {
+		this.sendmailorg = sendmailorg;
+	}
+	@Column(name = "sendmailorgname")
+	public String getSendmailorgname() {
+		return sendmailorgname;
+	}
+
+	public void setSendmailorgname(String sendmailorgname) {
+		this.sendmailorgname = sendmailorgname;
+	}
+	@Column(name = "sendmailtypename")
+	public String getSendmailtypename() {
+		return sendmailtypename;
+	}
+
+	public void setSendmailtypename(String sendmailtypename) {
+		this.sendmailtypename = sendmailtypename;
 	}
 }

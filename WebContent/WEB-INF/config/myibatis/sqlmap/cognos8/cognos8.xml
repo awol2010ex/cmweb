@@ -69,4 +69,15 @@ GROUP BY
          AND ID =#{ID}
      </if>
     </select>
+    
+    
+    <!--  删除定时任务明细 -->
+    <delete id="deleteTimeTaskDtl" parameterType="string" >
+	    delete from T_CM_TIME_TASK_DTL  where taskid =#{TASKID}
+    </delete>
+    
+    <!--  取得定时任务明细列表 -->
+    <select id="getAllTimeTaskDtlList" parameterType="string" resultType="com.cmweb.cognos8.vo.TCmTimeTaskDtlVO">
+	    select  * from T_CM_TIME_TASK_DTL  where taskid =#{TASKID} 
+    </select>
 </mapper>

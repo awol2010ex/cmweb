@@ -120,10 +120,10 @@ $(function (){
                 columns: [
                       {
                     	  
-                    	  display: '名称', name: 'name', isAllowHide: true ,align:"left" ,
+                    	  display: '名称', name: 'reportName', isAllowHide: true ,align:"left" ,
                     	  render: function (row)
                           {
-                              var html = "<img src='"+row.icon+"' style='width:12px;height:12px;' />&nbsp;"+row.name;
+                              var html = "<img src='"+row.icon+"' style='width:12px;height:12px;' />&nbsp;"+row.reportName;
                               return html;
                           }
 
@@ -204,10 +204,10 @@ $(function (){
                 columns: [
                       {
                     	  
-                    	  display: '名称', name: 'name', isAllowHide: true ,align:"left" ,width:"100%",
+                    	  display: '名称', name: 'reportName', isAllowHide: true ,align:"left" ,width:"100%",
                     	  render: function (row)
                           {
-                              var html = "<img src='"+row.icon+"' style='width:12px;height:12px;' />&nbsp;"+row.name;
+                              var html = "<img src='"+row.icon+"' style='width:12px;height:12px;' />&nbsp;"+row.reportName;
                               return html;
                           }
 
@@ -247,7 +247,7 @@ $(function (){
         	   }
         	   
         	   
-        	   
+        	   //发送邮件操作
         	   Cognos8Dwr.emailReport(
         			   $("#Text_sendMail_addr").val(),
         			   $("#Text_searchPath").val(),

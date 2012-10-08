@@ -9,6 +9,7 @@ import net.sf.json.JSONObject;
 import com.cmweb.cognos8.BaseClassWrapper;
 import com.cmweb.cognos8.CRNConnect;
 import com.cmweb.cognos8.quartz.ITask;
+import com.cmweb.cognos8.vo.TCmTimeTaskDtlVO;
 import com.cmweb.cognos8.vo.TCmTimeTaskLogDtlVO;
 import com.cmweb.cognos8.vo.TCmTimeTaskLogVO;
 import com.cmweb.cognos8.vo.TCmTimeTaskVO;
@@ -77,4 +78,13 @@ public interface ICognos8Service {
 	
 	//删除定时任务
 	public void removeTimeTask(String taskCode) throws Exception;
+	
+	
+	//保存定时任务明细
+	public void saveTimeTaskDtl(List<TCmTimeTaskDtlVO> list) throws Exception;
+	
+////删除定时任务明细
+	public void deleteTimeTaskDtl(String taskId) throws Exception;
+	//取得定时任务明细
+	public List<TCmTimeTaskDtlVO>  getAllTimeTaskDtlList(String taskId) throws Exception ;
 }

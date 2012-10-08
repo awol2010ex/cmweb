@@ -75,9 +75,13 @@ $(function() {
 	
 	//保存定时任务
 	$("#Button1").click(function(){
-
+		var params =utils.getFormData($("#form1")[0]);
+		//发送邮件部门
+		params.sendmailorg = $("#Text_sendMail_org").ligerGetComboBoxManager().getValue();
+		params.sendmailorgname = $("#Text_sendMail_org").val();
 		Cognos8Dwr.saveTimeTask(
-        	 utils.getFormData($("#form1")[0]),
+			 params,//主表
+			 grid_manager.getData(),//明细
              function(result){
                  if(result){
                     alert("保存成功");
@@ -135,17 +139,13 @@ $(function() {
 	
 	//报表列表
     grid=$("#grid").ligerGrid({
-
+         toolbar :{
+            items:[{text :"添加已选报表",icon:'add', click :addSelectedRows} ]         
+         },
          columns: [
                {
              	  
-             	  display: '名称', name: 'name', isAllowHide: true ,align:"left" ,
-             	  render: function (row)
-                   {
-                       var html = "<img src='"+row.icon+"' style='width:12px;height:12px;' />&nbsp;"+row.name;
-                       return html;
-                   }
-
+             	  display: '名称', name: 'reportName', isAllowHide: true ,align:"left" 
              	  
                },
                {
@@ -155,10 +155,10 @@ $(function() {
               		  var html="";
               		  if(!row.params || row.params==''){
             		  
-            	          html+="<a href=\"javascript:editParams('"+row.id+"',"+i+")\">参数</a>";
+            	          html+="<a href=\"javascript:editParams('"+((row.reportid && row.reportid!='')?(row.reportid):(row.id))+"',"+i+")\">参数</a>";
               	      }
               		  else{
-              			  html+="<a href=\"javascript:editParams('"+row.id+"',"+i+")\">"+row.params+"</a>";
+              			  html+="<a href=\"javascript:editParams('"+((row.reportid && row.reportid!='')?(row.reportid):(row.id))+"',"+i+")\">"+row.params+"</a>";
               		  }
             		  return html;
             	  }
@@ -220,6 +220,10 @@ $(function() {
 			  }
         }
     });
+  
+    $("#Text_sendMail_org").ligerGetComboBoxManager().setInputValue("${bean.sendmailorg}","${bean.sendmailorgname}");
+ 
+    document.getElementById("Text_sendMail_org").value ="${bean.sendmailorgname}";
     
     
     //发送邮件类型
@@ -237,16 +241,42 @@ $(function() {
 	
     
     <%if(request.getParameter("id")==null ){%>
-    //已选报表数据
+       addSelectedRows();//添加已选中报表
+    <%}else{%>
+       //列出明细
+       
+       Cognos8Dwr.getAllTimeTaskDtlList(
+    		   
+    	"<%=request.getParameter("id")%>",
+    		   
+        function(result){
+    		for(var i=0,s=result.length;i<s;i++){
+    			
+    			searchPathMap[result[i].reportid] =result[i].searchPath;
+    			
+    			grid.addRow(result[i]);
+    		}
+    	}  
+       
+       );
+       
+    
+    <%}%>
+    
+    
+    
+  
+});
+//添加已选中报表
+function addSelectedRows(){
+	//已选报表数据
     var  selected_data= top.selected_grid_manager.getData();
     for ( var i = 0; i < selected_data.length; i++) {
 		var row = selected_data[i];
 		searchPathMap[row.id]=row.searchPath;//查询路径缓存
 		grid.addRow(getCleanRow(row));
 	}
-    <%}%>
-  
-});
+}
 
 //编辑参数
 function editParams(id  ,index){
@@ -386,10 +416,10 @@ function editParams(id  ,index){
 				<td  align="left" class="l-table-edit-td" colspan="2">
 				<input
 					name="Text_sendMail_type_show" type="text" id="Text_sendMail_type_show"
-					ltype="text" style="width: 250px;" />
+					ltype="text" style="width: 250px;" field_name="sendmailtypename"  value="${bean.sendmailtypename}"/>
 				<input
 					name="Text_sendMail_type" type="text" id="Text_sendMail_type"
-					ltype="text" style="width: 250px;display:none" />
+					ltype="text" style="width: 250px;display:none" field_name="sendmailtype" value="${bean.sendmailtype}" />
 				</td>
 				<td align="left" width="100%"></td>
 	</tr>
@@ -397,7 +427,7 @@ function editParams(id  ,index){
 				<td  align="left" class="l-table-edit-td">发送邮件地址:</td>
 				<td  align="left" class="l-table-edit-td" colspan="2"><input
 					name="Text_sendMail_addr" type="text" id="Text_sendMail_addr"
-					ltype="text" style="width: 250px;" />
+					ltype="text" style="width: 250px;" field_name="sendmailaddr"  value="${bean.sendmailaddr}" />
 				</td>
 				<td align="left" width="100%"></td>
 	</tr>

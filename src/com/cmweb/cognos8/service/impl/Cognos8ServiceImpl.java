@@ -19,11 +19,13 @@ import com.cmweb.cognos8.BaseClassWrapper;
 import com.cmweb.cognos8.CRNConnect;
 import com.cmweb.cognos8.Email;
 import com.cmweb.cognos8.dao.ITCmTimeTaskDAO;
+import com.cmweb.cognos8.dao.ITCmTimeTaskDtlDAO;
 import com.cmweb.cognos8.dao.ITCmTimeTaskLogDAO;
 import com.cmweb.cognos8.dao.ITCmTimeTaskLogDtlDAO;
 import com.cmweb.cognos8.quartz.ITask;
 import com.cmweb.cognos8.quartz.TCmTimeTaskExecutor;
 import com.cmweb.cognos8.service.ICognos8Service;
+import com.cmweb.cognos8.vo.TCmTimeTaskDtlVO;
 import com.cmweb.cognos8.vo.TCmTimeTaskLogDtlVO;
 import com.cmweb.cognos8.vo.TCmTimeTaskLogVO;
 import com.cmweb.cognos8.vo.TCmTimeTaskVO;
@@ -45,6 +47,9 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 			.getLogger(Cognos8ServiceImpl.class);
 	@Autowired
 	private ITCmTimeTaskDAO tCmTimeTaskDAO; // 定时任务DAO
+	
+	@Autowired
+	private ITCmTimeTaskDtlDAO tCmTimeTaskDtlDAO; // 定时任务明细DAO
 
 	@Autowired
 	private ITCmTimeTaskLogDAO tCmTimeTaskLogDAO;// 发送邮件日志DAO
@@ -272,4 +277,25 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 	public void removeTimeTask(String taskCode) throws Exception {
 		tCmTimeTaskDAO.delete(taskCode);
 	}
+	
+	//取得定时任务明细
+	public List<TCmTimeTaskDtlVO>  getAllTimeTaskDtlList(String taskId) throws Exception {
+		return tCmTimeTaskDtlDAO.getAllTimeTaskDtlList(taskId);
+	}
+	
+	
+	//保存定时任务明细
+	@Transactional
+	public void saveTimeTaskDtl(List<TCmTimeTaskDtlVO> list) throws Exception{
+		tCmTimeTaskDtlDAO.saveAll(list);
+	}
+	
+	
+	////删除定时任务明细
+	@Transactional
+	public void deleteTimeTaskDtl(String taskId) throws Exception{
+		tCmTimeTaskDtlDAO.deleteTimeTaskDtl(taskId);
+	}
+	
+	
 }

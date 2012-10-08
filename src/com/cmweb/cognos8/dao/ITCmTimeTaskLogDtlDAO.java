@@ -10,7 +10,7 @@ import com.cmweb.cognos8.vo.TCmTimeTaskLogVO;
 //发送邮件日志明细DAO
 public interface ITCmTimeTaskLogDtlDAO {
 
-	//保存日志
+	//保存日志明细
 	public void saveAll(final List<TCmTimeTaskLogDtlVO> list) throws Exception ;
 	
 	//查询日志明细

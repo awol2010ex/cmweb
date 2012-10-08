@@ -22,6 +22,7 @@ import com.cmweb.cognos8.BaseClassWrapper;
 import com.cmweb.cognos8.CRNConnect;
 import com.cmweb.cognos8.ReportParameters;
 import com.cmweb.cognos8.service.ICognos8Service;
+import com.cmweb.cognos8.vo.TCmTimeTaskDtlVO;
 import com.cmweb.cognos8.vo.TCmTimeTaskLogDtlVO;
 import com.cmweb.cognos8.vo.TCmTimeTaskLogVO;
 import com.cmweb.cognos8.vo.TCmTimeTaskVO;
@@ -171,9 +172,21 @@ public class Cognos8Dwr {
 		//
 		return returnStr;
 	}
+	
+	//取得定时任务明细
+	public List<TCmTimeTaskDtlVO> getAllTimeTaskDtlList(String taskId){
+		try {
+			return cognos8Service.getAllTimeTaskDtlList(taskId);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			logger.error("",e);
+			
+			return null;
+		}
+	}
 
 	// 保存定时任务
-	public boolean saveTimeTask(TCmTimeTaskVO vo) {
+	public boolean saveTimeTask(TCmTimeTaskVO vo,List<TCmTimeTaskDtlVO> dtlList) {
 		try {
 			TCmTimeTaskVO bean = new TCmTimeTaskVO();
 			if (vo.getId() == null || "".equals(vo.getId().trim())) {// 新建
@@ -188,13 +201,17 @@ public class Cognos8Dwr {
 					bean.setLastupdateddatetime(new Timestamp(new Date()
 							.getTime()));// 最后修改时间
 					bean.setTaskname(vo.getTaskname());// 任务名
+					bean.setSendmailaddr(vo.getSendmailaddr());//发送邮箱地址
+					bean.setSendmailorg(vo.getSendmailorg());//发送部门ID
+					bean.setSendmailorgname(vo.getSendmailorgname());//发送部门名称
+					bean.setSendmailtype(vo.getSendmailtype());//发送 类型
+					bean.setSendmailtypename(vo.getSendmailtypename());//发送类型名称
 
 				} catch (Exception e) {
 					logger.error("", e);
 				}
 			}
 
-			bean.setLastupdateddatetime(bean.getCreateddatetime());// 最后修改时间
 
 			Subject currentUser = SecurityUtils.getSubject();
 			bean.setUsername((String) currentUser.getSession().getAttribute(
@@ -203,6 +220,23 @@ public class Cognos8Dwr {
 					"j_password"));// 登陆密码
 
 			cognos8Service.saveTimeTask(bean);// 保存到数据库
+			
+			//删除已有明细
+			cognos8Service.deleteTimeTaskDtl(bean.getId());
+			//保存明细
+			if(dtlList!= null && dtlList.size()>0){
+				    for(TCmTimeTaskDtlVO  dtlVO :dtlList){
+				    	   if(dtlVO.getReportid()==null){
+				    	      dtlVO.setReportid(vo.getId());//报表ID
+				    	    
+				    	   }
+				    	   dtlVO.setId(UUIDGenerator.generate());
+				    	   dtlVO.setTaskid(bean.getId());
+				    	    
+				    }
+				    cognos8Service.saveTimeTaskDtl(dtlList) ;
+				    
+			}
 
 			// 重启定时任务
 			cognos8Service.shutdown(bean.getId());

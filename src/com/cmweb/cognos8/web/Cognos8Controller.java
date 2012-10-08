@@ -175,7 +175,7 @@ public class Cognos8Controller {
 									.element("searchPath",
 											c.getSearchPath().getValue())
 									// searchPath
-									.element("name",
+									.element("reportName",
 											c.getDefaultName().getValue())
 									// 节点名称
 									.element("isexpand", false)
@@ -200,7 +200,7 @@ public class Cognos8Controller {
 					Rows.add(new JSONObject()
 							.element("searchPath", "/content")
 							// searchPath
-							.element("name", "公共文件夹")
+							.element("reportName", "公共文件夹")
 							// 节点名称
 							.element("isexpand", false)
 							// 不自动展开
