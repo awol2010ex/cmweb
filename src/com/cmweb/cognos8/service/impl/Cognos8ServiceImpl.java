@@ -160,8 +160,10 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 			throw new Exception(e);
 		}
 		if (svo != null) {
+			
 			// 启动任务
-			task = new TCmTimeTaskExecutor(svo);// 取得定时任务实例
+			
+			task = new TCmTimeTaskExecutor(svo,this.getAllTimeTaskDtlList(svo.getId()));// 取得定时任务实例
 			task.startTask(svo.getCron());
 			addTask(taskCode, task);
 		}

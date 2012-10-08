@@ -1,5 +1,7 @@
 package com.cmweb.cognos8.quartz;
 
+import java.util.List;
+
 import org.quartz.CronExpression;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
@@ -7,15 +9,19 @@ import org.quartz.JobDetail;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 
+import com.cmweb.cognos8.vo.TCmTimeTaskDtlVO;
 import com.cmweb.cognos8.vo.TCmTimeTaskVO;
 
 //cognos8发邮件定时任务
 public class TCmTimeTaskExecutor extends BaseTask {
 
-	private TCmTimeTaskVO taskVO;
+	private TCmTimeTaskVO taskVO;//定时任务信息对象
+	
+	private List<TCmTimeTaskDtlVO> dtlList;//定时任务信息对象
 
-	public TCmTimeTaskExecutor(TCmTimeTaskVO taskVO) {
+	public TCmTimeTaskExecutor(TCmTimeTaskVO taskVO, List<TCmTimeTaskDtlVO> dtlList) {
 		this.taskVO = taskVO;
+		this.dtlList =dtlList;
 	}
 
 	//覆盖启动任务方法,express 定时任务 cron表达式
@@ -37,6 +43,7 @@ public class TCmTimeTaskExecutor extends BaseTask {
 		JobDataMap map = new JobDataMap();
 		// 注入定时任务ID
 		map.put("taskVO", taskVO);
+		map.put("dtlList", dtlList);
 		jobDetail.setJobDataMap(map);
 
 		CronTrigger cronTrigger = new CronTrigger(taskVO.getId(),
@@ -74,6 +81,22 @@ public class TCmTimeTaskExecutor extends BaseTask {
 		if (this.scheduler != null) {
 			this.scheduler.start();
 		}
+	}
+
+	public TCmTimeTaskVO getTaskVO() {
+		return taskVO;
+	}
+
+	public void setTaskVO(TCmTimeTaskVO taskVO) {
+		this.taskVO = taskVO;
+	}
+
+	public List<TCmTimeTaskDtlVO> getDtlList() {
+		return dtlList;
+	}
+
+	public void setDtlList(List<TCmTimeTaskDtlVO> dtlList) {
+		this.dtlList = dtlList;
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.cmweb.cognos8.vo;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -142,4 +143,5 @@ public class TCmTimeTaskVO implements java.io.Serializable{
 	public void setSendmailtypename(String sendmailtypename) {
 		this.sendmailtypename = sendmailtypename;
 	}
+
 }
