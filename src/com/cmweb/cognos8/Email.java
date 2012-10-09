@@ -71,7 +71,7 @@ public class Email {
 	private static final int REP_XLWA = 7;
 	private static final int REP_singleXLS = 8;
 	private static final int REP_HTMLFragment = 9;
-
+	private static final int REP_XLSX=10;
 	/**
 	 * @param connection
 	 *            Connection to IBM Cognos 8
@@ -329,9 +329,11 @@ public class Email {
 			return new String[] { "singleXLS" };
 		case REP_HTMLFragment:
 			return new String[] { "HTMLFragment" };
+		case REP_XLSX:
+			return new String[]{"spreadsheetML"};
 		default:
 			logger.info("Invalid report output format."
-					+ " Must be one of: CSV, HTMLFragment, MHT, PDF, singleXLS, XHTML, XLS, XLWA, XML, HTML.");
+					+ " Must be one of: CSV, HTMLFragment, MHT, PDF, singleXLS, XHTML, XLS, XLWA, XML, HTML,spreadsheetML.");
 			return null;
 		}
 	}

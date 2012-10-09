@@ -312,7 +312,13 @@ $(function (){
                    { text: 'XML', id: '1' },
                    { text: 'PDF', id: '2' },
                    { text: 'CSV', id: '3' },
-                   { text: 'XLS', id: '4' }
+                   { text: 'XLS', id: '4' },
+                   { text: 'MHT', id: '5' },
+                   { text: 'XHTML', id: '6' },
+                   { text: 'XLWA', id: '7' },
+                   { text: 'singleXLS', id: '8' },
+                   { text: 'HTMLFragment', id: '9' },
+                   { text: 'XLSX', id: '10' }
                ], valueFieldID: 'Text_sendMail_type'
            });
 
