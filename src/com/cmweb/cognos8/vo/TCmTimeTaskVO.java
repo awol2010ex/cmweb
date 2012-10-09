@@ -1,7 +1,6 @@
 package com.cmweb.cognos8.vo;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,7 +9,7 @@ import javax.persistence.Table;
 
 import org.directwebremoting.annotations.DataTransferObject;
 import org.directwebremoting.convert.BeanConverter;
-
+//定时任务VO
 @Entity
 @Table(name = "T_CM_TIME_TASK")
 @DataTransferObject(converter=BeanConverter.class)

@@ -20,14 +20,11 @@ import com.cmweb.cognos8.CRNConnect;
 import com.cmweb.cognos8.Email;
 import com.cmweb.cognos8.dao.ITCmTimeTaskDAO;
 import com.cmweb.cognos8.dao.ITCmTimeTaskDtlDAO;
-import com.cmweb.cognos8.dao.ITCmTimeTaskLogDAO;
-import com.cmweb.cognos8.dao.ITCmTimeTaskLogDtlDAO;
 import com.cmweb.cognos8.quartz.ITask;
 import com.cmweb.cognos8.quartz.TCmTimeTaskExecutor;
+import com.cmweb.cognos8.service.ICognos8LogService;
 import com.cmweb.cognos8.service.ICognos8Service;
 import com.cmweb.cognos8.vo.TCmTimeTaskDtlVO;
-import com.cmweb.cognos8.vo.TCmTimeTaskLogDtlVO;
-import com.cmweb.cognos8.vo.TCmTimeTaskLogVO;
 import com.cmweb.cognos8.vo.TCmTimeTaskVO;
 import com.cognos.developer.schemas.bibus._3.AddressSMTP;
 import com.cognos.developer.schemas.bibus._3.AsynchRequest;
@@ -47,15 +44,12 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 			.getLogger(Cognos8ServiceImpl.class);
 	@Autowired
 	private ITCmTimeTaskDAO tCmTimeTaskDAO; // 定时任务DAO
-	
+
 	@Autowired
 	private ITCmTimeTaskDtlDAO tCmTimeTaskDtlDAO; // 定时任务明细DAO
 
 	@Autowired
-	private ITCmTimeTaskLogDAO tCmTimeTaskLogDAO;// 发送邮件日志DAO
-	@Autowired
-	private ITCmTimeTaskLogDtlDAO tCmTimeTaskLogDtlDAO;// 发送邮件日志明细DAO
-
+	private ICognos8LogService  cognos8LogService;//日志操作
 	// 登陆cognos
 	@Override
 	public void quickLogon(CRNConnect connection, String namespace, String uid,
@@ -106,7 +100,7 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 			AddressSMTP[] emails, AsynchRequest response, JSONArray params// 报表参数
 	) {
 		return new Email().emailReport(connection, report, bodyText,
-				emailSubject, emailFormat, emails, response,params);
+				emailSubject, emailFormat, emails, response, params);
 	}
 
 	private static Map<String, ITask> tasks = new HashMap<String, ITask>();// 当前定时任务列表
@@ -160,10 +154,11 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 			throw new Exception(e);
 		}
 		if (svo != null) {
-			
+
 			// 启动任务
-			
-			task = new TCmTimeTaskExecutor(svo,this.getAllTimeTaskDtlList(svo.getId()));// 取得定时任务实例
+
+			task = new TCmTimeTaskExecutor(svo, this.getAllTimeTaskDtlList(svo
+					.getId())  ,cognos8LogService);// 取得定时任务实例
 			task.startTask(svo.getCron());
 			addTask(taskCode, task);
 		}
@@ -171,42 +166,7 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 		return null;
 	}
 
-	// 保存发送日志
-	@Transactional
-	public void saveLog(TCmTimeTaskLogVO vo) throws Exception {
-		tCmTimeTaskLogDAO.save(vo);
-	}
-
-	// 保存发送日志明细
-	@Transactional
-	public void saveLogDtl(List<TCmTimeTaskLogDtlVO> list) throws Exception {
-		tCmTimeTaskLogDtlDAO.saveAll(list);
-	}
-
-	// 取得日志列表
-	public JSONObject getLogList(Map<String, Object> map, int offset,
-			int pagesize) throws Exception {
-		JSONObject result = new JSONObject();
-
-		result.put("Total", tCmTimeTaskLogDAO.getLogCount(map));// 总行数
-		result.put("Rows", JSONArray.fromObject(tCmTimeTaskLogDAO.getLogList(
-				map, offset, pagesize)));// 当前页查询结构
-
-		return result;
-	}
-
-	// 取得日志明细列表
-	public JSONObject getLogDtlList(Map<String, Object> map, int offset,
-			int pagesize) throws Exception {
-		JSONObject result = new JSONObject();
-
-		result.put("Total", tCmTimeTaskLogDtlDAO.getLogDtlCount(map));// 总行数
-		result.put("Rows", JSONArray.fromObject(tCmTimeTaskLogDtlDAO
-				.getLogDtlList(map, offset, pagesize)));// 当前页查询结构
-
-		return result;
-	}
-
+	
 	// 取得定时任务
 	public TCmTimeTaskVO getTimeTask(String id) throws Exception {
 		return tCmTimeTaskDAO.getTask(id);
@@ -279,25 +239,23 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 	public void removeTimeTask(String taskCode) throws Exception {
 		tCmTimeTaskDAO.delete(taskCode);
 	}
-	
-	//取得定时任务明细
-	public List<TCmTimeTaskDtlVO>  getAllTimeTaskDtlList(String taskId) throws Exception {
+
+	// 取得定时任务明细
+	public List<TCmTimeTaskDtlVO> getAllTimeTaskDtlList(String taskId)
+			throws Exception {
 		return tCmTimeTaskDtlDAO.getAllTimeTaskDtlList(taskId);
 	}
-	
-	
-	//保存定时任务明细
+
+	// 保存定时任务明细
 	@Transactional
-	public void saveTimeTaskDtl(List<TCmTimeTaskDtlVO> list) throws Exception{
+	public void saveTimeTaskDtl(List<TCmTimeTaskDtlVO> list) throws Exception {
 		tCmTimeTaskDtlDAO.saveAll(list);
 	}
-	
-	
-	////删除定时任务明细
+
+	// //删除定时任务明细
 	@Transactional
-	public void deleteTimeTaskDtl(String taskId) throws Exception{
+	public void deleteTimeTaskDtl(String taskId) throws Exception {
 		tCmTimeTaskDtlDAO.deleteTimeTaskDtl(taskId);
 	}
-	
-	
+
 }

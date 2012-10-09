@@ -7,7 +7,7 @@ import javax.persistence.Table;
 
 import org.directwebremoting.annotations.DataTransferObject;
 import org.directwebremoting.convert.BeanConverter;
-
+//定时任务明细VO
 @Entity
 @Table(name = "T_CM_TIME_TASK_DTL")
 @DataTransferObject(converter=BeanConverter.class)

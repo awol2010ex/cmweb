@@ -19,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.cmweb.cognos8.CRNConnect;
+import com.cmweb.cognos8.service.ICognos8LogService;
 import com.cmweb.cognos8.service.ICognos8Service;
 import com.cmweb.cognos8.vo.TCmTimeTaskVO;
 import com.cognos.developer.schemas.bibus._3.Analysis;
@@ -40,7 +41,8 @@ public class Cognos8Controller {
 
 	@Autowired
 	ICognos8Service cognos8Service;// 目录操作
-
+	@Autowired
+	ICognos8LogService cognos8LogService;// 日志操作
 	// 子节点列表
 	@RequestMapping(value = "/path/list")
 	public void getChildren(HttpServletRequest request,
@@ -242,7 +244,7 @@ public class Cognos8Controller {
 
 			// 分页查询结果
 			try {
-				result = cognos8Service.getLogList(map, (page - 1) * pagesize,
+				result = cognos8LogService.getLogList(map, (page - 1) * pagesize,
 						pagesize);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -273,7 +275,7 @@ public class Cognos8Controller {
 
 			// 分页查询结果
 			try {
-				result = cognos8Service.getLogDtlList(map, (page - 1)
+				result = cognos8LogService.getLogDtlList(map, (page - 1)
 						* pagesize, pagesize);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block

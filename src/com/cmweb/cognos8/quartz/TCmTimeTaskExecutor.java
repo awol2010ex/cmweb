@@ -9,6 +9,7 @@ import org.quartz.JobDetail;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 
+import com.cmweb.cognos8.service.ICognos8LogService;
 import com.cmweb.cognos8.vo.TCmTimeTaskDtlVO;
 import com.cmweb.cognos8.vo.TCmTimeTaskVO;
 
@@ -18,10 +19,13 @@ public class TCmTimeTaskExecutor extends BaseTask {
 	private TCmTimeTaskVO taskVO;//定时任务信息对象
 	
 	private List<TCmTimeTaskDtlVO> dtlList;//定时任务信息对象
+	
+	private ICognos8LogService cognos8LogService;//日志操作
 
-	public TCmTimeTaskExecutor(TCmTimeTaskVO taskVO, List<TCmTimeTaskDtlVO> dtlList) {
+	public TCmTimeTaskExecutor(TCmTimeTaskVO taskVO, List<TCmTimeTaskDtlVO> dtlList ,ICognos8LogService cognos8LogService) {
 		this.taskVO = taskVO;
 		this.dtlList =dtlList;
+		this.cognos8LogService =cognos8LogService;
 	}
 
 	//覆盖启动任务方法,express 定时任务 cron表达式
@@ -41,9 +45,10 @@ public class TCmTimeTaskExecutor extends BaseTask {
 		JobDetail jobDetail = new JobDetail(taskVO.getId(),
 				"cognos8.4 time email", TCmTimeTaskJob.class);
 		JobDataMap map = new JobDataMap();
-		// 注入定时任务ID
+		// 注入定时任务相关信息
 		map.put("taskVO", taskVO);
 		map.put("dtlList", dtlList);
+		map.put("cognos8LogService", cognos8LogService);
 		jobDetail.setJobDataMap(map);
 
 		CronTrigger cronTrigger = new CronTrigger(taskVO.getId(),

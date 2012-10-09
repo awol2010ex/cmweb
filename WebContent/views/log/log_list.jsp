@@ -40,6 +40,7 @@ $(function (){
               { display: '发送人', name: 'SENDER', width: "20%",isAllowHide: true },
               { display: '报表名', name: 'REPORTNAME', width: "20%",isAllowHide: true },
               { display: '发送时间', name: 'CREATEDDATETIME', width: "20%",isAllowHide: true,type:'date' },
+              { display: '结果', name: 'LOGRESULT', width: "20%",isAllowHide: true },
               { display: '发送人数', name: 'DTLCOUNT', width: "20%",isAllowHide: true,
             	render :function(row){
             		  

@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.cmweb.cognos8.BaseClassWrapper;
 import com.cmweb.cognos8.CRNConnect;
 import com.cmweb.cognos8.ReportParameters;
+import com.cmweb.cognos8.service.ICognos8LogService;
 import com.cmweb.cognos8.service.ICognos8Service;
 import com.cmweb.cognos8.vo.TCmTimeTaskDtlVO;
 import com.cmweb.cognos8.vo.TCmTimeTaskLogDtlVO;
@@ -40,6 +41,8 @@ public class Cognos8Dwr {
 
 	@Autowired
 	ICognos8Service cognos8Service;// 目录操作
+	@Autowired
+	ICognos8LogService cognos8LogService;// 日志操作
 	@Autowired
 	private SSOAuthManager ssoAuthManager;// SSO相关信息操作类
 
@@ -146,7 +149,7 @@ public class Cognos8Dwr {
 		log.setLogresult(returnStr);// 日志信息
 
 		try {
-			cognos8Service.saveLog(log);
+			cognos8LogService.saveLog(log);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			logger.error("", e);
@@ -162,7 +165,7 @@ public class Cognos8Dwr {
 				dtl_list.add(log_dtl);
 			}
 			try {
-				cognos8Service.saveLogDtl(dtl_list);
+				cognos8LogService.saveLogDtl(dtl_list);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				logger.error("", e);
