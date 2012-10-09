@@ -51,6 +51,7 @@ import com.cognos.developer.schemas.bibus._3.PropEnum;
 import com.cognos.developer.schemas.bibus._3.QueryOptions;
 import com.cognos.developer.schemas.bibus._3.RunOptionBoolean;
 import com.cognos.developer.schemas.bibus._3.RunOptionEnum;
+import com.cognos.developer.schemas.bibus._3.RunOptionString;
 import com.cognos.developer.schemas.bibus._3.RunOptionStringArray;
 import com.cognos.developer.schemas.bibus._3.SearchPathMultipleObject;
 import com.cognos.developer.schemas.bibus._3.SearchPathSingleObject;
@@ -136,7 +137,15 @@ public class Email {
 			}
            */
 			// Set the run options for the execute method.
-			Option[] execRunOptions = new Option[2];// 报表运行参数
+			Option[] execRunOptions = null;
+			if(emailFormat!=REP_PDF){
+			   execRunOptions=new Option[2];// 报表运行参数
+			}
+			else{
+				execRunOptions=new Option[3];// 报表运行参数
+			}
+			
+			
 			Option[] emailRunOptions = new Option[6];// 邮件发送参数
 
 			if (response == null) {
@@ -145,7 +154,10 @@ public class Email {
 				// subsequent requests
 				execRunOptions[0] = setEmailFormat(emailFormat);
 				execRunOptions[1] = setNoPrompt();
-
+				if(emailFormat==REP_PDF){
+					//PDF设置横向
+					execRunOptions[2] = this.setPdfOrient("landscape");
+				}
 				asynchReply = connection.getReportService().run(
 						new SearchPathSingleObject(reportPath),
 						reportParameters, execRunOptions);
@@ -271,6 +283,14 @@ public class Email {
 		RunOptionStringArray rof = new RunOptionStringArray();
 		rof.setName(RunOptionEnum.outputFormat);
 		rof.setValue(this.getReportFormat(emailFormat));
+		return rof;
+	}
+	
+	//设置PDF横纵向
+	public RunOptionString setPdfOrient(String orient) {
+		RunOptionString rof = new RunOptionString();
+		rof.setName(RunOptionEnum.outputPageOrientation);
+		rof.setValue(orient);
 		return rof;
 	}
 
