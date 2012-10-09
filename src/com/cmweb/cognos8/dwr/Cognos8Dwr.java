@@ -23,6 +23,7 @@ import com.cmweb.cognos8.CRNConnect;
 import com.cmweb.cognos8.ReportParameters;
 import com.cmweb.cognos8.service.ICognos8LogService;
 import com.cmweb.cognos8.service.ICognos8Service;
+import com.cmweb.cognos8.service.ICognos8TimeService;
 import com.cmweb.cognos8.vo.TCmTimeTaskDtlVO;
 import com.cmweb.cognos8.vo.TCmTimeTaskLogDtlVO;
 import com.cmweb.cognos8.vo.TCmTimeTaskLogVO;
@@ -43,6 +44,8 @@ public class Cognos8Dwr {
 	ICognos8Service cognos8Service;// 目录操作
 	@Autowired
 	ICognos8LogService cognos8LogService;// 日志操作
+	@Autowired
+	ICognos8TimeService cognos8TimeService;// 定时任务操作
 	@Autowired
 	private SSOAuthManager ssoAuthManager;// SSO相关信息操作类
 
@@ -179,7 +182,7 @@ public class Cognos8Dwr {
 	//取得定时任务明细
 	public List<TCmTimeTaskDtlVO> getAllTimeTaskDtlList(String taskId){
 		try {
-			return cognos8Service.getAllTimeTaskDtlList(taskId);
+			return cognos8TimeService.getAllTimeTaskDtlList(taskId);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			logger.error("",e);
@@ -199,7 +202,7 @@ public class Cognos8Dwr {
 
 			} else {// 修改
 				try {
-					bean = cognos8Service.getTimeTask(vo.getId().trim());// 取得定时任务信息
+					bean = cognos8TimeService.getTimeTask(vo.getId().trim());// 取得定时任务信息
 					bean.setCron(vo.getCron());// cron表达式
 					bean.setLastupdateddatetime(new Timestamp(new Date()
 							.getTime()));// 最后修改时间
@@ -222,10 +225,10 @@ public class Cognos8Dwr {
 			bean.setPassword((String) currentUser.getSession().getAttribute(
 					"j_password"));// 登陆密码
 
-			cognos8Service.saveTimeTask(bean);// 保存到数据库
+			cognos8TimeService.saveTimeTask(bean);// 保存到数据库
 			
 			//删除已有明细
-			cognos8Service.deleteTimeTaskDtl(bean.getId());
+			cognos8TimeService.deleteTimeTaskDtl(bean.getId());
 			//保存明细
 			if(dtlList!= null && dtlList.size()>0){
 				    for(TCmTimeTaskDtlVO  dtlVO :dtlList){
@@ -237,13 +240,13 @@ public class Cognos8Dwr {
 				    	   dtlVO.setTaskid(bean.getId());
 				    	    
 				    }
-				    cognos8Service.saveTimeTaskDtl(dtlList) ;
+				    cognos8TimeService.saveTimeTaskDtl(dtlList) ;
 				    
 			}
 
 			// 重启定时任务
-			cognos8Service.shutdown(bean.getId());
-			cognos8Service.startTask(bean.getId(), bean.getCron());
+			cognos8TimeService.shutdown(bean.getId());
+			cognos8TimeService.startTask(bean.getId(), bean.getCron());
 		} catch (Exception e) {
 			logger.error("", e);
 			return false;
@@ -255,10 +258,10 @@ public class Cognos8Dwr {
 	public boolean removeTimeTask(String taskCode) {
 		try {
 
-			cognos8Service.removeTimeTask(taskCode);// 删除定时任务
+			cognos8TimeService.removeTimeTask(taskCode);// 删除定时任务
 
 			// 关闭定时任务
-			cognos8Service.shutdown(taskCode);
+			cognos8TimeService.shutdown(taskCode);
 		} catch (Exception e) {
 			logger.error("", e);
 			return false;

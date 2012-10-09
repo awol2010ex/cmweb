@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.cmweb.cognos8.CRNConnect;
 import com.cmweb.cognos8.service.ICognos8LogService;
 import com.cmweb.cognos8.service.ICognos8Service;
+import com.cmweb.cognos8.service.ICognos8TimeService;
 import com.cmweb.cognos8.vo.TCmTimeTaskVO;
 import com.cognos.developer.schemas.bibus._3.Analysis;
 import com.cognos.developer.schemas.bibus._3.BaseClass;
@@ -43,6 +44,8 @@ public class Cognos8Controller {
 	ICognos8Service cognos8Service;// 目录操作
 	@Autowired
 	ICognos8LogService cognos8LogService;// 日志操作
+	@Autowired
+	ICognos8TimeService cognos8TimeService;// 定时任务操作
 	// 子节点列表
 	@RequestMapping(value = "/path/list")
 	public void getChildren(HttpServletRequest request,
@@ -299,7 +302,7 @@ public class Cognos8Controller {
 		TCmTimeTaskVO bean = null;
 		if (id != null) {
 			try {
-				bean = cognos8Service.getTimeTask(id);
+				bean = cognos8TimeService.getTimeTask(id);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				logger.error("", e);
@@ -324,7 +327,7 @@ public class Cognos8Controller {
 
 		// 分页查询结果
 		try {
-			result = cognos8Service.getTimeTaskList(map, (page - 1) * pagesize,
+			result = cognos8TimeService.getTimeTaskList(map, (page - 1) * pagesize,
 					pagesize);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
