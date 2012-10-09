@@ -2,10 +2,12 @@ package com.cmweb.cognos8.service.impl;
 
 import net.sf.json.JSONArray;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cmweb.cognos8.BaseClassWrapper;
 import com.cmweb.cognos8.CRNConnect;
+import com.cmweb.cognos8.CRNConnectFactory;
 import com.cmweb.cognos8.Email;
 import com.cmweb.cognos8.service.ICognos8Service;
 import com.cognos.developer.schemas.bibus._3.AddressSMTP;
@@ -76,4 +78,10 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 				emailSubject, emailFormat, emails, response, params);
 	}
 
+	@Autowired
+	private CRNConnectFactory crnConnectFactory;// 生成连接
+	public CRNConnect createConnect() {//创建连接
+		return crnConnectFactory.createConnect();
+	}
+	
 }

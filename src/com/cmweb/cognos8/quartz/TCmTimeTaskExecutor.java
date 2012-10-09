@@ -10,8 +10,10 @@ import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 
 import com.cmweb.cognos8.service.ICognos8LogService;
+import com.cmweb.cognos8.service.ICognos8Service;
 import com.cmweb.cognos8.vo.TCmTimeTaskDtlVO;
 import com.cmweb.cognos8.vo.TCmTimeTaskVO;
+import com.cmweb.sso.SSOAuthManager;
 
 //cognos8发邮件定时任务
 public class TCmTimeTaskExecutor extends BaseTask {
@@ -21,11 +23,17 @@ public class TCmTimeTaskExecutor extends BaseTask {
 	private List<TCmTimeTaskDtlVO> dtlList;//定时任务信息对象
 	
 	private ICognos8LogService cognos8LogService;//日志操作
+	
+	private  ICognos8Service cognos8Service;//报表操作
+	
+	private   SSOAuthManager ssoAuthManager;
 
-	public TCmTimeTaskExecutor(TCmTimeTaskVO taskVO, List<TCmTimeTaskDtlVO> dtlList ,ICognos8LogService cognos8LogService) {
+	public TCmTimeTaskExecutor(TCmTimeTaskVO taskVO, List<TCmTimeTaskDtlVO> dtlList ,ICognos8LogService cognos8LogService,ICognos8Service cognos8Service,SSOAuthManager ssoAuthManager) {
 		this.taskVO = taskVO;
 		this.dtlList =dtlList;
 		this.cognos8LogService =cognos8LogService;
+		this.cognos8Service =cognos8Service;
+		this.ssoAuthManager =ssoAuthManager;
 	}
 
 	//覆盖启动任务方法,express 定时任务 cron表达式
@@ -49,6 +57,8 @@ public class TCmTimeTaskExecutor extends BaseTask {
 		map.put("taskVO", taskVO);
 		map.put("dtlList", dtlList);
 		map.put("cognos8LogService", cognos8LogService);
+		map.put("cognos8Service", cognos8Service);
+		map.put("ssoAuthManager", ssoAuthManager);
 		jobDetail.setJobDataMap(map);
 
 		CronTrigger cronTrigger = new CronTrigger(taskVO.getId(),

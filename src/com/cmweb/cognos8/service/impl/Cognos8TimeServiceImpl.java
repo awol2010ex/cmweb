@@ -20,9 +20,11 @@ import com.cmweb.cognos8.dao.ITCmTimeTaskDtlDAO;
 import com.cmweb.cognos8.quartz.ITask;
 import com.cmweb.cognos8.quartz.TCmTimeTaskExecutor;
 import com.cmweb.cognos8.service.ICognos8LogService;
+import com.cmweb.cognos8.service.ICognos8Service;
 import com.cmweb.cognos8.service.ICognos8TimeService;
 import com.cmweb.cognos8.vo.TCmTimeTaskDtlVO;
 import com.cmweb.cognos8.vo.TCmTimeTaskVO;
+import com.cmweb.sso.SSOAuthManager;
 
 //cognos8 定时任务逻辑层
 @Service
@@ -38,7 +40,10 @@ public class Cognos8TimeServiceImpl implements ICognos8TimeService {
 
 	@Autowired
 	private ICognos8LogService cognos8LogService;// 日志操作
-
+	@Autowired
+	private SSOAuthManager ssoAuthManager;// SSO相关信息操作类
+	@Autowired
+	private ICognos8Service cognos8Service;// 报表操作
 	// 停止并删除定时任务
 	public synchronized void shutdown(String taskCode) throws Exception {
 		// TODO Auto-generated method stub
@@ -92,7 +97,7 @@ public class Cognos8TimeServiceImpl implements ICognos8TimeService {
 			// 启动任务
 
 			task = new TCmTimeTaskExecutor(svo, this.getAllTimeTaskDtlList(svo
-					.getId()), cognos8LogService);// 取得定时任务实例
+					.getId()), cognos8LogService,cognos8Service,ssoAuthManager);// 取得定时任务实例
 			task.startTask(svo.getCron());
 			addTask(taskCode, task);
 		}

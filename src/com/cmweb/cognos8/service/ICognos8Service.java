@@ -11,6 +11,7 @@ import com.cognos.developer.schemas.bibus._3.BaseClass;
 //cognos 8 逻辑层操作
 public interface ICognos8Service {
 
+	public CRNConnect createConnect() ;//创建连接
 	// 登陆cognos
 	public void quickLogon(CRNConnect connection, String namespace, String uid,
 			String pwd) throws Exception;

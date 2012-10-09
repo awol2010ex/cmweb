@@ -305,18 +305,22 @@ function editParams(id  ,index){
 		        			   
 		        			text:"确定",onclick: function(item, dialog){
 		        				
-		        				var _params ={};//参数值
+		        				var _params= "[]";//报表参数值
 		        				var _fields =$("#param_edit_form").data("fields");
 		        				if(_fields && _fields.length>0){
+		        					var array=[];
 		        					for(var i=0,s=_fields.length;i<s;i++){
-		        						_params[_fields[i].name] = $("#"+_fields[i].name).val();
+		        						var obj ={};
+		        	        	    	obj.name =_fields[i].name;
+		        	        	    	obj.value =$("#"+_fields[i].name).val();
+		        		        		array.push(obj);
 		        					}
+		        					_params = JSON.stringify(array);
 		        				}
 		        				
-		        				var _params_str= JSON.stringify(_params);//参数值
 		        				
 		        				//更新字段
-		        				grid_manager.updateCell("params" ,_params_str , grid_manager.getRowObj(parseInt($("#param_edit_form").data("index"))));
+		        				grid_manager.updateCell("params" ,_params , grid_manager.getRowObj(parseInt($("#param_edit_form").data("index"))));
 		        				
 		        				dialog.hide();
 		        		    }
