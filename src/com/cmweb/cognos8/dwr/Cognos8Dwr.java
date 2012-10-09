@@ -257,7 +257,7 @@ public class Cognos8Dwr {
 	// 删除定时任务
 	public boolean removeTimeTask(String taskCode) {
 		try {
-
+			cognos8TimeService.deleteTimeTaskDtl(taskCode);//删除定时任务明细
 			cognos8TimeService.removeTimeTask(taskCode);// 删除定时任务
 
 			// 关闭定时任务
