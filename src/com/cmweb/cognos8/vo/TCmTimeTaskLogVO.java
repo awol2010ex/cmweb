@@ -12,31 +12,29 @@ import org.directwebremoting.convert.BeanConverter;
 
 @Entity
 @Table(name = "T_CM_TIME_TASK_LOG")
-@DataTransferObject(converter=BeanConverter.class)
-public class TCmTimeTaskLogVO implements java.io.Serializable{
+@DataTransferObject(converter = BeanConverter.class)
+public class TCmTimeTaskLogVO implements java.io.Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 7271715768230020911L;
 	private String id;
-	private String reportid ;//报表ID
-	private String searchPath ;//搜索路径
-	
-	private String reportName ;// 报表名
-	
-	
-	private Timestamp createdDatetime ;//发送时间
+	private String reportid;// 报表ID
+	private String searchPath;// 搜索路径
 
-	private String logresult ;//日志信息
-	
-	
-	private String sender ;//发送人
+	private String reportName;// 报表名
+
+	private Timestamp createdDatetime;// 发送时间
+
+	private String logresult;// 日志信息
+
+	private String sender;// 发送人
+
 	@Id
 	@Column(name = "id")
 	public String getId() {
 		return id;
 	}
-
 
 	public void setId(String id) {
 		this.id = id;
@@ -47,7 +45,6 @@ public class TCmTimeTaskLogVO implements java.io.Serializable{
 		return searchPath;
 	}
 
-
 	public void setSearchPath(String searchPath) {
 		this.searchPath = searchPath;
 	}
@@ -56,7 +53,6 @@ public class TCmTimeTaskLogVO implements java.io.Serializable{
 	public String getReportName() {
 		return reportName;
 	}
-
 
 	public void setReportName(String reportName) {
 		this.reportName = reportName;
@@ -67,7 +63,6 @@ public class TCmTimeTaskLogVO implements java.io.Serializable{
 		return createdDatetime;
 	}
 
-
 	public void setCreatedDatetime(Timestamp createdDatetime) {
 		this.createdDatetime = createdDatetime;
 	}
@@ -76,7 +71,6 @@ public class TCmTimeTaskLogVO implements java.io.Serializable{
 	public String getLogresult() {
 		return logresult;
 	}
-
 
 	public void setLogresult(String logresult) {
 		this.logresult = logresult;
@@ -87,7 +81,6 @@ public class TCmTimeTaskLogVO implements java.io.Serializable{
 		return sender;
 	}
 
-
 	public void setSender(String sender) {
 		this.sender = sender;
 	}
@@ -97,10 +90,8 @@ public class TCmTimeTaskLogVO implements java.io.Serializable{
 		return reportid;
 	}
 
-
 	public void setReportid(String reportid) {
 		this.reportid = reportid;
 	}
-	
-	
+
 }

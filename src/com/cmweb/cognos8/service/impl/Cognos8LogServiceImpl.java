@@ -19,13 +19,12 @@ import com.cmweb.cognos8.vo.TCmTimeTaskLogVO;
 //cognos8日志相关接口
 @Service
 public class Cognos8LogServiceImpl implements ICognos8LogService {
-	
+
 	@Autowired
 	private ITCmTimeTaskLogDAO tCmTimeTaskLogDAO;// 发送邮件日志DAO
 	@Autowired
 	private ITCmTimeTaskLogDtlDAO tCmTimeTaskLogDtlDAO;// 发送邮件日志明细DAO
-	
-	
+
 	// 保存发送日志
 	@Transactional
 	public void saveLog(TCmTimeTaskLogVO vo) throws Exception {

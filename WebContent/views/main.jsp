@@ -250,6 +250,7 @@ $(function (){
         	   //发送邮件操作
         	   Cognos8Dwr.emailReport(
         			   $("#Text_sendMail_addr").val(),
+        			   $("#Text_sendMail_ccaddr").val(),
         			   $("#Text_searchPath").val(),
         			   parseInt($("#Text_sendMail_type").val()),
 
@@ -525,6 +526,14 @@ function viewLog(id){
 				<td style="padding: 5px" align="left">发送邮件地址:</td>
 				<td style="padding: 5px" align="left"><input
 					name="Text_sendMail_addr" type="text" id="Text_sendMail_addr"
+					ltype="text" style="width: 250px;" />
+				</td>
+			</tr>
+			
+			<tr>
+				<td style="padding: 5px" align="left">抄送邮件地址:</td>
+				<td style="padding: 5px" align="left"><input
+					name="Text_sendMail_ccaddr" type="text" id="Text_sendMail_ccaddr"
 					ltype="text" style="width: 250px;" />
 				</td>
 			</tr>

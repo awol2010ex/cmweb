@@ -49,8 +49,11 @@ public class Cognos8Dwr {
 	@Autowired
 	private SSOAuthManager ssoAuthManager;// SSO相关信息操作类
 
-	public String emailReport(String emails, String searchPath, int type,
-			String body, String subject, String orgs ,String params) {
+	public String emailReport(
+			String emails,// 发送邮箱
+			String ccemails,// 抄送邮箱
+			String searchPath, int type, String body, String subject,
+			String orgs, String params) {
 		Subject currentUser = SecurityUtils.getSubject();// 会话
 
 		// 取得cognos连接
@@ -60,6 +63,8 @@ public class Cognos8Dwr {
 		String returnStr = null;// 返回结果
 
 		AddressSMTP[] smtpList = null;// 邮箱列表
+
+		AddressSMTP[] ccsmtpList = null;// 抄送邮箱列表
 
 		BaseClass report = null;// 报表对象
 		if (connection != null) {
@@ -81,6 +86,7 @@ public class Cognos8Dwr {
 
 				if (emails != null && !"".equals(emails)) {
 
+					// 发送邮箱地址
 					String[] emailsTokens = emails.split(";");
 					if (emailsTokens.length > 0) {
 
@@ -115,12 +121,22 @@ public class Cognos8Dwr {
 												"EMAIL"));
 							}
 						}
+
+						// 抄送邮箱地址
+						String[] ccemailsTokens = ccemails.split(";");
+						// 抄送邮箱地址列表
+						ccsmtpList = new AddressSMTP[len];
+						for (int i = 0, s = ccemailsTokens.length; i < s; i++) {// 填写的邮箱地址
+							ccsmtpList[i] = new AddressSMTP(ccemailsTokens[i]);
+						}
+
 						// 发送邮件
 						returnStr = cognos8Service.emailReport(connection,
-								reportObject, body, subject, type, smtpList,
+								reportObject, body, subject, type, smtpList,// 发送邮箱
+								ccsmtpList,// 抄送邮箱
 								null
-								
-								,JSONArray .fromObject(params)//报表参数
+
+								, JSONArray.fromObject(params)// 报表参数
 								);
 					} else {
 						returnStr = "邮件地址不正确";
@@ -178,21 +194,21 @@ public class Cognos8Dwr {
 		//
 		return returnStr;
 	}
-	
-	//取得定时任务明细
-	public List<TCmTimeTaskDtlVO> getAllTimeTaskDtlList(String taskId){
+
+	// 取得定时任务明细
+	public List<TCmTimeTaskDtlVO> getAllTimeTaskDtlList(String taskId) {
 		try {
 			return cognos8TimeService.getAllTimeTaskDtlList(taskId);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			logger.error("",e);
-			
+			logger.error("", e);
+
 			return null;
 		}
 	}
 
 	// 保存定时任务
-	public boolean saveTimeTask(TCmTimeTaskVO vo,List<TCmTimeTaskDtlVO> dtlList) {
+	public boolean saveTimeTask(TCmTimeTaskVO vo, List<TCmTimeTaskDtlVO> dtlList) {
 		try {
 			TCmTimeTaskVO bean = new TCmTimeTaskVO();
 			if (vo.getId() == null || "".equals(vo.getId().trim())) {// 新建
@@ -207,17 +223,16 @@ public class Cognos8Dwr {
 					bean.setLastupdateddatetime(new Timestamp(new Date()
 							.getTime()));// 最后修改时间
 					bean.setTaskname(vo.getTaskname());// 任务名
-					bean.setSendmailaddr(vo.getSendmailaddr());//发送邮箱地址
-					bean.setSendmailorg(vo.getSendmailorg());//发送部门ID
-					bean.setSendmailorgname(vo.getSendmailorgname());//发送部门名称
-					bean.setSendmailtype(vo.getSendmailtype());//发送 类型
-					bean.setSendmailtypename(vo.getSendmailtypename());//发送类型名称
-
+					bean.setSendmailaddr(vo.getSendmailaddr());// 发送邮箱地址
+					bean.setSendmailorg(vo.getSendmailorg());// 发送部门ID
+					bean.setSendmailorgname(vo.getSendmailorgname());// 发送部门名称
+					bean.setSendmailtype(vo.getSendmailtype());// 发送 类型
+					bean.setSendmailtypename(vo.getSendmailtypename());// 发送类型名称
+					bean.setCcmailaddr(vo.getCcmailaddr());// 抄送邮箱地址
 				} catch (Exception e) {
 					logger.error("", e);
 				}
 			}
-
 
 			Subject currentUser = SecurityUtils.getSubject();
 			bean.setUsername((String) currentUser.getSession().getAttribute(
@@ -226,22 +241,22 @@ public class Cognos8Dwr {
 					"j_password"));// 登陆密码
 
 			cognos8TimeService.saveTimeTask(bean);// 保存到数据库
-			
-			//删除已有明细
+
+			// 删除已有明细
 			cognos8TimeService.deleteTimeTaskDtl(bean.getId());
-			//保存明细
-			if(dtlList!= null && dtlList.size()>0){
-				    for(TCmTimeTaskDtlVO  dtlVO :dtlList){
-				    	   if(dtlVO.getReportid()==null){
-				    	      dtlVO.setReportid(vo.getId());//报表ID
-				    	    
-				    	   }
-				    	   dtlVO.setId(UUIDGenerator.generate());
-				    	   dtlVO.setTaskid(bean.getId());
-				    	    
-				    }
-				    cognos8TimeService.saveTimeTaskDtl(dtlList) ;
-				    
+			// 保存明细
+			if (dtlList != null && dtlList.size() > 0) {
+				for (TCmTimeTaskDtlVO dtlVO : dtlList) {
+					if (dtlVO.getReportid() == null) {
+						dtlVO.setReportid(vo.getId());// 报表ID
+
+					}
+					dtlVO.setId(UUIDGenerator.generate());
+					dtlVO.setTaskid(bean.getId());
+
+				}
+				cognos8TimeService.saveTimeTaskDtl(dtlList);
+
 			}
 
 			// 重启定时任务
@@ -257,7 +272,7 @@ public class Cognos8Dwr {
 	// 删除定时任务
 	public boolean removeTimeTask(String taskCode) {
 		try {
-			cognos8TimeService.deleteTimeTaskDtl(taskCode);//删除定时任务明细
+			cognos8TimeService.deleteTimeTaskDtl(taskCode);// 删除定时任务明细
 			cognos8TimeService.removeTimeTask(taskCode);// 删除定时任务
 
 			// 关闭定时任务

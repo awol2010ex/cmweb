@@ -18,25 +18,28 @@ import com.cmweb.sso.SSOAuthManager;
 //cognos8发邮件定时任务
 public class TCmTimeTaskExecutor extends BaseTask {
 
-	private TCmTimeTaskVO taskVO;//定时任务信息对象
-	
-	private List<TCmTimeTaskDtlVO> dtlList;//定时任务信息对象
-	
-	private ICognos8LogService cognos8LogService;//日志操作
-	
-	private  ICognos8Service cognos8Service;//报表操作
-	
-	private   SSOAuthManager ssoAuthManager;
+	private TCmTimeTaskVO taskVO;// 定时任务信息对象
 
-	public TCmTimeTaskExecutor(TCmTimeTaskVO taskVO, List<TCmTimeTaskDtlVO> dtlList ,ICognos8LogService cognos8LogService,ICognos8Service cognos8Service,SSOAuthManager ssoAuthManager) {
+	private List<TCmTimeTaskDtlVO> dtlList;// 定时任务信息对象
+
+	private ICognos8LogService cognos8LogService;// 日志操作
+
+	private ICognos8Service cognos8Service;// 报表操作
+
+	private SSOAuthManager ssoAuthManager;
+
+	public TCmTimeTaskExecutor(TCmTimeTaskVO taskVO,
+			List<TCmTimeTaskDtlVO> dtlList,
+			ICognos8LogService cognos8LogService,
+			ICognos8Service cognos8Service, SSOAuthManager ssoAuthManager) {
 		this.taskVO = taskVO;
-		this.dtlList =dtlList;
-		this.cognos8LogService =cognos8LogService;
-		this.cognos8Service =cognos8Service;
-		this.ssoAuthManager =ssoAuthManager;
+		this.dtlList = dtlList;
+		this.cognos8LogService = cognos8LogService;
+		this.cognos8Service = cognos8Service;
+		this.ssoAuthManager = ssoAuthManager;
 	}
 
-	//覆盖启动任务方法,express 定时任务 cron表达式
+	// 覆盖启动任务方法,express 定时任务 cron表达式
 	@Override
 	public void startTask(String express) throws Exception {
 		// TODO Auto-generated method stub
@@ -73,25 +76,28 @@ public class TCmTimeTaskExecutor extends BaseTask {
 		this.scheduler.start();
 	}
 
-	//停止
+	// 停止
 	public void stopTask() throws Exception {
 		if (this.scheduler != null) {
 			this.scheduler.shutdown();
 		}
 	}
-    //中止
+
+	// 中止
 	public void pauseTask() throws Exception {
 		if (this.scheduler != null) {
 			this.scheduler.standby();
 		}
 	}
-	//立刻停止
+
+	// 立刻停止
 	public void stopTask(boolean immediately) throws Exception {
 		if (this.scheduler != null) {
 			this.scheduler.shutdown(immediately);
 		}
 	}
-    //恢复
+
+	// 恢复
 	public void resumeTask() throws Exception {
 		if (this.scheduler != null) {
 			this.scheduler.start();

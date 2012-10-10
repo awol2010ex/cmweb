@@ -450,6 +450,14 @@ function editParams(id  ,index){
 				<td align="left" width="100%"></td>
 	</tr>
 	<tr>
+				<td  align="left" class="l-table-edit-td">抄送邮件地址:</td>
+				<td  align="left" class="l-table-edit-td" colspan="2"><input
+					name="Text_ccMail_addr" type="text" id="Text_ccMail_addr"
+					ltype="text" style="width: 250px;" field_name="ccmailaddr"  value="${bean.ccmailaddr}" />
+				</td>
+				<td align="left" width="100%"></td>
+	</tr>
+	<tr>
 	
 	    <td colspan="4" style="padding:10px">
 	      <!-- 已选报表列表 -->

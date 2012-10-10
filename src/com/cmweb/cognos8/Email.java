@@ -71,7 +71,8 @@ public class Email {
 	private static final int REP_XLWA = 7;
 	private static final int REP_singleXLS = 8;
 	private static final int REP_HTMLFragment = 9;
-	private static final int REP_XLSX=10;
+	private static final int REP_XLSX = 10;
+
 	/**
 	 * @param connection
 	 *            Connection to IBM Cognos 8
@@ -95,7 +96,9 @@ public class Email {
 	 */
 	public String emailReport(CRNConnect connection, BaseClassWrapper report,
 			String bodyText, String emailSubject, int emailFormat,
-			AddressSMTP[] emails, AsynchRequest response, JSONArray params) {
+			AddressSMTP[] emails,// 发送地址
+			AddressSMTP[] ccemails,// 抄送地址
+			AsynchRequest response, JSONArray params) {
 		AsynchReply asynchReply = null;
 		String reportPath = report.getBaseClassObject().getSearchPath()
 				.getValue();
@@ -128,34 +131,35 @@ public class Email {
 			//
 
 			/*
-			ReportParameters repParms = new ReportParameters();
-			BaseParameter[] prm = repParms.getReportParameters(report,
-					connection);
-
-			if (prm != null && prm.length > 0) {
-				reportParameters = ReportParameters.setReportParameters(prm);
-			}
-           */
+			 * ReportParameters repParms = new ReportParameters();
+			 * BaseParameter[] prm = repParms.getReportParameters(report,
+			 * connection);
+			 * 
+			 * if (prm != null && prm.length > 0) { reportParameters =
+			 * ReportParameters.setReportParameters(prm); }
+			 */
 			// Set the run options for the execute method.
 			Option[] execRunOptions = null;
-			if(emailFormat!=REP_PDF){
-			   execRunOptions=new Option[2];// 报表运行参数
+			if (emailFormat != REP_PDF) {
+				execRunOptions = new Option[2];// 报表运行参数
+			} else {
+				execRunOptions = new Option[3];// 报表运行参数
 			}
-			else{
-				execRunOptions=new Option[3];// 报表运行参数
-			}
-			
-			
-			Option[] emailRunOptions = new Option[6];// 邮件发送参数
 
+			Option[] emailRunOptions = null;
+			if (ccemails == null || ccemails.length == 0) {
+				emailRunOptions = new Option[6];// 邮件发送参数
+			} else {
+				emailRunOptions = new Option[7];// 邮件发送参数
+			}
 			if (response == null) {
 				// Execute the report, specify output format
 				// set the continueConversation option, to allow
 				// subsequent requests
 				execRunOptions[0] = setEmailFormat(emailFormat);
 				execRunOptions[1] = setNoPrompt();
-				if(emailFormat==REP_PDF){
-					//PDF设置横向
+				if (emailFormat == REP_PDF) {
+					// PDF设置横向
 					execRunOptions[2] = this.setPdfOrient("landscape");
 				}
 				asynchReply = connection.getReportService().run(
@@ -191,12 +195,17 @@ public class Email {
 				// If no email addresses are specified, send the email
 				// message to all contacts.
 				if (emails != null && emails.length > 0) {
-					emailRunOptions[3] = setEmailAddresses(emails);
+					emailRunOptions[3] = setEmailAddresses(emails);// 设置发送邮箱
 				} else {
 					emailRunOptions[3] = getContactEmails(connection);
 				}
 				emailRunOptions[4] = setEmailBody(bodyText);
 				emailRunOptions[5] = setContinueConversation();
+
+				// 设置抄送邮箱
+				if (ccemails != null && ccemails.length > 0) {
+					emailRunOptions[6] = setCCEmailAddresses(ccemails);
+				}
 
 				// call email
 				// sn_dg_sdk_method_reportService_deliver_start_1
@@ -240,6 +249,7 @@ public class Email {
 
 	}
 
+	// 设置发送邮箱
 	public DeliveryOptionAddressSMTPArray setEmailAddresses(AddressSMTP[] emails) {
 		// The emails can also be taken from CM as group, user, etc.(see Email
 		// class)
@@ -247,6 +257,19 @@ public class Email {
 
 		emailAddress.setName(DeliveryOptionEnum.toAddress);
 		emailAddress.setValue(emails);
+
+		return emailAddress;
+	}
+
+	// 设置抄送邮箱
+	public DeliveryOptionAddressSMTPArray setCCEmailAddresses(
+			AddressSMTP[] ccemails) {
+		// The emails can also be taken from CM as group, user, etc.(see Email
+		// class)
+		DeliveryOptionAddressSMTPArray emailAddress = new DeliveryOptionAddressSMTPArray();
+
+		emailAddress.setName(DeliveryOptionEnum.ccAddress);
+		emailAddress.setValue(ccemails);
 
 		return emailAddress;
 	}
@@ -285,8 +308,8 @@ public class Email {
 		rof.setValue(this.getReportFormat(emailFormat));
 		return rof;
 	}
-	
-	//设置PDF横纵向
+
+	// 设置PDF横纵向
 	public RunOptionString setPdfOrient(String orient) {
 		RunOptionString rof = new RunOptionString();
 		rof.setName(RunOptionEnum.outputPageOrientation);
@@ -330,7 +353,7 @@ public class Email {
 		case REP_HTMLFragment:
 			return new String[] { "HTMLFragment" };
 		case REP_XLSX:
-			return new String[]{"spreadsheetML"};
+			return new String[] { "spreadsheetML" };
 		default:
 			logger.info("Invalid report output format."
 					+ " Must be one of: CSV, HTMLFragment, MHT, PDF, singleXLS, XHTML, XLS, XLWA, XML, HTML,spreadsheetML.");

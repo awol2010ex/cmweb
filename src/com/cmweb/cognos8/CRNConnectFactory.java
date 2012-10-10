@@ -2,6 +2,7 @@ package com.cmweb.cognos8;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 //cognos8 连接生成器
 @Service
 public class CRNConnectFactory {

@@ -46,6 +46,7 @@ public class Cognos8Controller {
 	ICognos8LogService cognos8LogService;// 日志操作
 	@Autowired
 	ICognos8TimeService cognos8TimeService;// 定时任务操作
+
 	// 子节点列表
 	@RequestMapping(value = "/path/list")
 	public void getChildren(HttpServletRequest request,
@@ -247,8 +248,8 @@ public class Cognos8Controller {
 
 			// 分页查询结果
 			try {
-				result = cognos8LogService.getLogList(map, (page - 1) * pagesize,
-						pagesize);
+				result = cognos8LogService.getLogList(map, (page - 1)
+						* pagesize, pagesize);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				logger.error("", e);
@@ -327,8 +328,8 @@ public class Cognos8Controller {
 
 		// 分页查询结果
 		try {
-			result = cognos8TimeService.getTimeTaskList(map, (page - 1) * pagesize,
-					pagesize);
+			result = cognos8TimeService.getTimeTaskList(map, (page - 1)
+					* pagesize, pagesize);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			logger.error("", e);

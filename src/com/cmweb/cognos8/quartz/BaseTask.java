@@ -1,6 +1,7 @@
 package com.cmweb.cognos8.quartz;
 
 import org.quartz.Scheduler;
+
 //定时任务基类
 public abstract class BaseTask implements ITask {
 	protected Scheduler scheduler = null;

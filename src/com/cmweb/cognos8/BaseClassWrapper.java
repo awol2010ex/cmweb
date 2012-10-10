@@ -1,4 +1,5 @@
 package com.cmweb.cognos8;
+
 /**
  * BaseClassWrapper.java
  * 
@@ -7,51 +8,42 @@ package com.cmweb.cognos8;
  *
  * Thin wrapper class for keeping BaseClass objects in GUI containers
  * 
-*/
+ */
 
 import com.cognos.developer.schemas.bibus._3.BaseClass;
 
 public class BaseClassWrapper {
-	
+
 	private BaseClass myBaseClass = null;
-	
-	
-	//constructor
-	public BaseClassWrapper(BaseClass newBaseClass)
-	{
+
+	// constructor
+	public BaseClassWrapper(BaseClass newBaseClass) {
 		myBaseClass = newBaseClass;
 	}
-	
-	
-	public BaseClass getBaseClassObject () 
-	{
+
+	public BaseClass getBaseClassObject() {
 		return myBaseClass;
 	}
 
-	public void setBaseClassObject(BaseClass newBaseClassObject)
-	{
+	public void setBaseClassObject(BaseClass newBaseClassObject) {
 		myBaseClass = newBaseClassObject;
 	}
-	
-	//Override toString()
-	public String toString()
-	{
-		if (myBaseClass != null)
-		{
+
+	// Override toString()
+	public String toString() {
+		if (myBaseClass != null) {
 			return myBaseClass.getDefaultName().getValue();
 		}
-		
+
 		return null;
 	}
-	
-	public String getSearchPath()
-	{
-		if (myBaseClass != null)
-		{
+
+	public String getSearchPath() {
+		if (myBaseClass != null) {
 			return myBaseClass.getSearchPath().getValue();
 		}
-		
+
 		return null;
 	}
-	
+
 }

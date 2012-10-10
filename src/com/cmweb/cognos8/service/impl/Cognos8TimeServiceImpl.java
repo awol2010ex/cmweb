@@ -44,6 +44,7 @@ public class Cognos8TimeServiceImpl implements ICognos8TimeService {
 	private SSOAuthManager ssoAuthManager;// SSO相关信息操作类
 	@Autowired
 	private ICognos8Service cognos8Service;// 报表操作
+
 	// 停止并删除定时任务
 	public synchronized void shutdown(String taskCode) throws Exception {
 		// TODO Auto-generated method stub
@@ -97,7 +98,8 @@ public class Cognos8TimeServiceImpl implements ICognos8TimeService {
 			// 启动任务
 
 			task = new TCmTimeTaskExecutor(svo, this.getAllTimeTaskDtlList(svo
-					.getId()), cognos8LogService,cognos8Service,ssoAuthManager);// 取得定时任务实例
+					.getId()), cognos8LogService, cognos8Service,
+					ssoAuthManager);// 取得定时任务实例
 			task.startTask(svo.getCron());
 			addTask(taskCode, task);
 		}

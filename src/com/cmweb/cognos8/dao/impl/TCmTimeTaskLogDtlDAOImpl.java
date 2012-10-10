@@ -20,16 +20,20 @@ public class TCmTimeTaskLogDtlDAOImpl extends
 		HibernateDao<TCmTimeTaskLogDtlVO, String> implements
 		ITCmTimeTaskLogDtlDAO {
 	@Autowired
-	@Qualifier("sqlSession") 
+	@Qualifier("sqlSession")
 	private SqlSession sqlSession;
-	
-	//查询日志
+
+	// 查询日志
 	@SuppressWarnings("unchecked")
-	public List<TCmTimeTaskLogVO> getLogDtlList(Map<String,Object> map ,int offset ,int pagesize) throws Exception {
-		return sqlSession.selectList("com.cmweb.cognos8.getLogDtlList",map, new RowBounds(offset, pagesize));
+	public List<TCmTimeTaskLogVO> getLogDtlList(Map<String, Object> map,
+			int offset, int pagesize) throws Exception {
+		return sqlSession.selectList("com.cmweb.cognos8.getLogDtlList", map,
+				new RowBounds(offset, pagesize));
 	}
-	//查询日志行数
-	public  Integer getLogDtlCount(Map<String,Object> map ) throws Exception {
-		return (Integer)sqlSession.selectOne("com.cmweb.cognos8.getLogDtlCount",map);
+
+	// 查询日志行数
+	public Integer getLogDtlCount(Map<String, Object> map) throws Exception {
+		return (Integer) sqlSession.selectOne(
+				"com.cmweb.cognos8.getLogDtlCount", map);
 	}
 }

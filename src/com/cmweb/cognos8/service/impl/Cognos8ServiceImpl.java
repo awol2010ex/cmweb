@@ -72,16 +72,19 @@ public class Cognos8ServiceImpl implements ICognos8Service {
 	// 根据报表发邮件
 	public String emailReport(CRNConnect connection, BaseClassWrapper report,
 			String bodyText, String emailSubject, int emailFormat,
-			AddressSMTP[] emails, AsynchRequest response, JSONArray params// 报表参数
+			AddressSMTP[] emails, // 发送地址
+			AddressSMTP[] ccemails,// 抄送地址
+			AsynchRequest response, JSONArray params// 报表参数
 	) {
 		return new Email().emailReport(connection, report, bodyText,
-				emailSubject, emailFormat, emails, response, params);
+				emailSubject, emailFormat, emails, ccemails, response, params);
 	}
 
 	@Autowired
 	private CRNConnectFactory crnConnectFactory;// 生成连接
-	public CRNConnect createConnect() {//创建连接
+
+	public CRNConnect createConnect() {// 创建连接
 		return crnConnectFactory.createConnect();
 	}
-	
+
 }

@@ -13,15 +13,16 @@ public interface ICognos8LogService {
 
 	// 保存发送日志
 	public void saveLog(TCmTimeTaskLogVO vo) throws Exception;
-	
-	//保存发送日志明细
+
+	// 保存发送日志明细
 	public void saveLogDtl(List<TCmTimeTaskLogDtlVO> list) throws Exception;
-	
-	
-	//取得日志列表 
-	public JSONObject getLogList(Map<String,Object> map,int offset ,int pagesize) throws Exception; 
-	
-	//取得日志明细列表 
-	public JSONObject getLogDtlList(Map<String,Object> map,int offset ,int pagesize) throws Exception; 
-	
+
+	// 取得日志列表
+	public JSONObject getLogList(Map<String, Object> map, int offset,
+			int pagesize) throws Exception;
+
+	// 取得日志明细列表
+	public JSONObject getLogDtlList(Map<String, Object> map, int offset,
+			int pagesize) throws Exception;
+
 }

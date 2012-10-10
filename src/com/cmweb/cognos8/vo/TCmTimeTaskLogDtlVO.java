@@ -7,11 +7,12 @@ import javax.persistence.Table;
 
 import org.directwebremoting.annotations.DataTransferObject;
 import org.directwebremoting.convert.BeanConverter;
+
 //发送邮件日志明细VO
 @Entity
 @Table(name = "T_CM_TIME_TASK_LOG_DTL")
-@DataTransferObject(converter=BeanConverter.class)
-public class TCmTimeTaskLogDtlVO implements java.io.Serializable{
+@DataTransferObject(converter = BeanConverter.class)
+public class TCmTimeTaskLogDtlVO implements java.io.Serializable {
 
 	/**
 	 * 
@@ -19,10 +20,11 @@ public class TCmTimeTaskLogDtlVO implements java.io.Serializable{
 	private static final long serialVersionUID = 3237194745833332842L;
 
 	private String id;
-	
-	private String logid ;//日志ID
-	
-	private String email ;//发送邮箱地址
+
+	private String logid;// 日志ID
+
+	private String email;// 发送邮箱地址
+
 	@Id
 	@Column(name = "id")
 	public String getId() {
@@ -32,6 +34,7 @@ public class TCmTimeTaskLogDtlVO implements java.io.Serializable{
 	public void setId(String id) {
 		this.id = id;
 	}
+
 	@Column(name = "logid")
 	public String getLogid() {
 		return logid;
@@ -40,6 +43,7 @@ public class TCmTimeTaskLogDtlVO implements java.io.Serializable{
 	public void setLogid(String logid) {
 		this.logid = logid;
 	}
+
 	@Column(name = "email")
 	public String getEmail() {
 		return email;

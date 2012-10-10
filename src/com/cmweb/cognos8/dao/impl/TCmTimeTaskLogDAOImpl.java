@@ -17,18 +17,22 @@ import com.cmweb.orm.hibernate.HibernateDao;
 @Repository
 public class TCmTimeTaskLogDAOImpl extends
 		HibernateDao<TCmTimeTaskLogVO, String> implements ITCmTimeTaskLogDAO {
-	
+
 	@Autowired
-	@Qualifier("sqlSession") 
+	@Qualifier("sqlSession")
 	private SqlSession sqlSession;
-	
-	//查询日志
+
+	// 查询日志
 	@SuppressWarnings("unchecked")
-	public List<TCmTimeTaskLogVO> getLogList(Map<String,Object> map ,int offset ,int pagesize) throws Exception {
-		return sqlSession.selectList("com.cmweb.cognos8.getLogList",map, new RowBounds(offset, pagesize));
+	public List<TCmTimeTaskLogVO> getLogList(Map<String, Object> map,
+			int offset, int pagesize) throws Exception {
+		return sqlSession.selectList("com.cmweb.cognos8.getLogList", map,
+				new RowBounds(offset, pagesize));
 	}
-	//查询日志行数
-	public  Integer getLogCount(Map<String,Object> map ) throws Exception {
-		return (Integer)sqlSession.selectOne("com.cmweb.cognos8.getLogCount",map);
+
+	// 查询日志行数
+	public Integer getLogCount(Map<String, Object> map) throws Exception {
+		return (Integer) sqlSession.selectOne("com.cmweb.cognos8.getLogCount",
+				map);
 	}
 }

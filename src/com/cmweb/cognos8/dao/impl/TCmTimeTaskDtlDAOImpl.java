@@ -15,18 +15,21 @@ import com.cmweb.orm.hibernate.HibernateDao;
 @Repository
 public class TCmTimeTaskDtlDAOImpl extends
 		HibernateDao<TCmTimeTaskDtlVO, String> implements ITCmTimeTaskDtlDAO {
-	
+
 	@Autowired
-	@Qualifier("sqlSession") 
+	@Qualifier("sqlSession")
 	private SqlSession sqlSession;
-	//删除明细
+
+	// 删除明细
 	public void deleteTimeTaskDtl(String taskId) throws Exception {
-		sqlSession.delete("com.cmweb.cognos8.deleteTimeTaskDtl",taskId);
+		sqlSession.delete("com.cmweb.cognos8.deleteTimeTaskDtl", taskId);
 	}
-	
-	//取得定时任务明细
+
+	// 取得定时任务明细
 	@SuppressWarnings("unchecked")
-	public List<TCmTimeTaskDtlVO>  getAllTimeTaskDtlList(String taskId) throws Exception {
-		return sqlSession.selectList("com.cmweb.cognos8.getAllTimeTaskDtlList",taskId);
+	public List<TCmTimeTaskDtlVO> getAllTimeTaskDtlList(String taskId)
+			throws Exception {
+		return sqlSession.selectList("com.cmweb.cognos8.getAllTimeTaskDtlList",
+				taskId);
 	}
 }

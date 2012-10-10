@@ -11,8 +11,9 @@ import com.cognos.developer.schemas.bibus._3.BaseClass;
 //cognos 8 逻辑层操作
 public interface ICognos8Service {
 
-	public CRNConnect createConnect() ;//创建连接
+	public CRNConnect createConnect();// 创建连接
 	// 登陆cognos
+
 	public void quickLogon(CRNConnect connection, String namespace, String uid,
 			String pwd) throws Exception;
 
@@ -23,7 +24,9 @@ public interface ICognos8Service {
 	// 根据报表发邮件
 	public String emailReport(CRNConnect connection, BaseClassWrapper report,
 			String bodyText, String emailSubject, int emailFormat,
-			AddressSMTP[] emails, AsynchRequest response, JSONArray params// 报表参数
-			);
-	
+			AddressSMTP[] emails, // 发送地址
+			AddressSMTP[] ccemails,// 抄送地址
+			AsynchRequest response, JSONArray params// 报表参数
+	);
+
 }
