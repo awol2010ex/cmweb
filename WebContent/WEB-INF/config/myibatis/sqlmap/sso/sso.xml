@@ -51,7 +51,7 @@
 	<!-- 用户搜索 -->
     <select id="searchUser" parameterType="map" resultType="map">
 		
-	 SELECT  USER_NAME FIRST_NAME ,USER_NAME LAST_NAME ,USER_NAME  NICK_NAME ,OFFICE_EMAIL EMAIL  from VW_CAS_USERS_BASE_T  where  user_src='AD'
+	 SELECT  USER_ID,USER_NAME FIRST_NAME ,USER_NAME LAST_NAME ,USER_NAME  NICK_NAME ,OFFICE_EMAIL EMAIL  from VW_CAS_USERS_BASE_T  where  user_src='AD'
 	 
 	 <if test="FIRST_NAME!=null and FIRST_NAME!=''">    
          AND USER_NAME  like   '%${FIRST_NAME}%'

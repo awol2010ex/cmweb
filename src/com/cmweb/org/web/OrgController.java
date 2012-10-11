@@ -39,6 +39,8 @@ public class OrgController {
 			map.put("PID", pid);// 父节点ID
 		}
 
+		JSONArray result = new JSONArray();
+
 		// 搜索机构列表
 		List<Map<String, Object>> orgList = null;
 		try {
@@ -47,7 +49,7 @@ public class OrgController {
 			// TODO Auto-generated catch block
 			logger.error("", e);
 		}
-		JSONArray result = new JSONArray();
+
 		if (orgList != null && orgList.size() > 0) {
 
 			for (Map<String, Object> m : orgList) {
@@ -57,6 +59,26 @@ public class OrgController {
 						.element("isexpand", false)
 						// 不自动展开
 						.element("children", new JSONArray()));
+			}
+
+		}
+
+		// 搜索人员列表
+		List<Map<String, Object>> userList = null;
+		try {
+			userList = ssoAuthManager.searchUser(map);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			logger.error("", e);
+		}
+		if (userList != null && userList.size() > 0) {
+
+			for (Map<String, Object> m : userList) {
+				result.add(JSONObject.fromObject(m)
+						.element("id", String.valueOf(m.get("USER_ID")))// 人员ID
+						.element("name", (String) m.get("NICK_NAME"))// 人员名
+						.element("hascheckbox", false)// 不显示多选框
+				);
 			}
 
 		}

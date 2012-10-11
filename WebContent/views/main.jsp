@@ -282,6 +282,9 @@ $(function (){
 				   idFieldName:"id",
 				   isLeaf:function(data){
 						//这是BUG吧,为什么isLeaf 是 true ,hasChildren 就是true呢,看源代码
+						if(data.USER_ID){
+							return false;
+						}
 						return true;
 				   },
 				   onBeforeExpand : function(node) {
