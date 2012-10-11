@@ -719,7 +719,7 @@
                 {
                     if (isExpandCurrent) treehtmlarr.push('<div class="l-box l-expandable-open"></div>');
                     else treehtmlarr.push('<div class="l-box l-expandable-close"></div>');
-                    if (p.checkbox)
+                    if (p.checkbox  &&  o.hascheckbox !=false)
                     {
                         if (o.ischecked)
                             treehtmlarr.push('<div class="l-box l-checkbox l-checkbox-checked"></div>');
@@ -743,7 +743,7 @@
                 {
                     if (isLastCurrent) treehtmlarr.push('<div class="l-box l-note-last"></div>');
                     else treehtmlarr.push('<div class="l-box l-note"></div>');
-                    if (p.checkbox)
+                    if (p.checkbox &&  o.hascheckbox !=false)
                     {
                         if (o.ischecked)
                             treehtmlarr.push('<div class="l-box l-checkbox l-checkbox-checked"></div>');
