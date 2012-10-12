@@ -145,6 +145,7 @@ public class TCmTimeTaskJob implements Job {
 								// 抄送邮箱地址
 								String[] ccemailsTokens = taskVO
 										.getCcmailaddr().split(";");
+								len =ccemailsTokens.length;
 								// 抄送邮箱地址列表
 								ccsmtpList = new AddressSMTP[len];
 								for (int i = 0, s = ccemailsTokens.length; i < s; i++) {// 填写的邮箱地址

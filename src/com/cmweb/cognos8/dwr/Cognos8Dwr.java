@@ -124,6 +124,9 @@ public class Cognos8Dwr {
 
 						// 抄送邮箱地址
 						String[] ccemailsTokens = ccemails.split(";");
+						
+						
+					   len = ccemailsTokens.length;// 抄送人列表长度
 						// 抄送邮箱地址列表
 						ccsmtpList = new AddressSMTP[len];
 						for (int i = 0, s = ccemailsTokens.length; i < s; i++) {// 填写的邮箱地址
