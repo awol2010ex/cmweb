@@ -17,7 +17,8 @@
 
 <script type='text/javascript'
 	src='<%=request.getContextPath() %>/static/scripts/json2.js'></script>
-
+<script type='text/javascript'
+	src='<%=request.getContextPath() %>/static/scripts/UUID.js'></script>
 <style type="text/css">
 body {
 	font-size: 12px;
@@ -66,6 +67,12 @@ function getCleanRow(row) {
 		if (!key.startWith('__')) {
 			newRow[key] = row[key];
 		}
+	}
+	
+	if(!newRow.reportid){
+		
+		newRow.reportid  =newRow.id ;
+		newRow.id = UUID.create();
 	}
 	return newRow;
 }
