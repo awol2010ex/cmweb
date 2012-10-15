@@ -139,8 +139,15 @@ $(function() {
 	
 	//报表列表
     grid=$("#grid").ligerGrid({
+    	 checkbox:true,
          toolbar :{
-            items:[{text :"添加已选报表",icon:'add', click :addSelectedRows} ]         
+            items:[
+                   
+                  {text :"添加已选报表",icon:'add', click :addSelectedRows} ,
+                  {text :"删除报表",icon:'delete', click :removeSelectedRows} 
+            
+            ]    
+            
          },
          columns: [
                {
@@ -285,6 +292,12 @@ function addSelectedRows(){
 		searchPathMap[row.id]=row.searchPath;//查询路径缓存
 		grid.addRow(getCleanRow(row));
 	}
+}
+
+//删除以选中报表
+function removeSelectedRows(){
+	grid_manager.deleteSelectedRow();
+
 }
 
 //编辑参数
